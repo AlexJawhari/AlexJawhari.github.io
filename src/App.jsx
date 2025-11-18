@@ -235,6 +235,38 @@ const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
   }
 })
 
+const PLANETS = [
+  {
+    id: 'azure',
+    className: 'planet planet--azure planet--rings',
+    base: { top: '6%', left: '74%' },
+    xRange: [0, -260],
+    yRange: [0, 260]
+  },
+  {
+    id: 'obsidian',
+    className: 'planet planet--obsidian',
+    base: { top: '80%', left: '8%' },
+    xRange: [0, 220],
+    yRange: [0, -310]
+  },
+  {
+    id: 'ember',
+    className: 'planet planet--ember planet--halo',
+    base: { top: '70%', left: '82%' },
+    xRange: [0, -80],
+    yRange: [0, 220]
+  }
+]
+
+const SHOOTING_STAR_PATHS = [
+  { id: 'east-long', top: 14, left: -20, path: 'path-right', delay: 0 },
+  { id: 'zenith', top: 32, left: 45, path: 'path-right-short', delay: 4.5 },
+  { id: 'west-return', top: 58, left: 110, path: 'path-left', delay: 9 },
+  { id: 'north-arc', top: 22, left: 85, path: 'path-left-short', delay: 13.5 },
+  { id: 'southern-drift', top: 78, left: 5, path: 'path-right-diagonal', delay: 18 }
+]
+
 /* -------------------------------------------------------------------------- */
 /*                                UI components                               */
 /* -------------------------------------------------------------------------- */
@@ -272,12 +304,11 @@ const OrbitBackdrop = () => {
   const orbitRotation = useTransform(scrollYProgress, [0, 1], [0, 90])
   const auroraOffsetY = useTransform(scrollYProgress, [0, 1], [0, -260])
   const auroraOpacity = useTransform(scrollYProgress, [0, 0.3, 1], [0.9, 0.7, 0.4])
-  const planet1Y = useTransform(scrollYProgress, [0, 1], [0, 220])
-  const planet1X = useTransform(scrollYProgress, [0, 1], [0, -160])
-  const planet2Y = useTransform(scrollYProgress, [0, 1], [0, -260])
-  const planet2X = useTransform(scrollYProgress, [0, 1], [0, 140])
-  const planet3Y = useTransform(scrollYProgress, [0, 1], [0, 190])
-  const planet3X = useTransform(scrollYProgress, [0, 1], [0, 60])
+  const planetTransforms = PLANETS.map(planet => ({
+    ...planet,
+    x: useTransform(scrollYProgress, [0, 1], planet.xRange),
+    y: useTransform(scrollYProgress, [0, 1], planet.yRange)
+  }))
 
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none">
@@ -297,14 +328,14 @@ const OrbitBackdrop = () => {
             }}
           />
         ))}
-        {[...Array(4)].map((_, idx) => (
+        {SHOOTING_STAR_PATHS.map(star => (
           <span
-            key={`shoot-${idx}`}
-            className="shooting-star"
+            key={star.id}
+            className={`shooting-star ${star.path}`}
             style={{
-              top: `${10 + idx * 22}%`,
-              left: `${-20 + idx * 10}%`,
-              animationDelay: `${idx * 3.2}s`
+              top: `${star.top}%`,
+              left: `${star.left}%`,
+              animationDelay: `${star.delay}s`
             }}
           />
         ))}
@@ -315,9 +346,13 @@ const OrbitBackdrop = () => {
         ))}
       </motion.div>
       <div className="absolute inset-0">
-        <motion.span className="planet planet-1" style={{ y: planet1Y, x: planet1X }} />
-        <motion.span className="planet planet-2" style={{ y: planet2Y, x: planet2X }} />
-        <motion.span className="planet planet-3" style={{ y: planet3Y, x: planet3X }} />
+        {planetTransforms.map(planet => (
+          <motion.span
+            key={planet.id}
+            className={planet.className}
+            style={{ top: planet.base.top, left: planet.base.left, x: planet.x, y: planet.y }}
+          />
+        ))}
       </div>
       <motion.div className="absolute inset-0 aurora" style={{ y: auroraOffsetY, opacity: auroraOpacity }} />
     </div>
