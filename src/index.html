@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alexander Jawhari - Software Engineer</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+<!--
+
+import React, { useState, useEffect } from 'react';
+import { Github, Linkedin, Mail, ExternalLink, Code2, Zap, Brain } from 'lucide-react';
+
+const Portfolio = () => {
+  const [activeTab, setActiveTab] = useState('home');
+  const [stars, setStars] = useState([]);
+
+  // Generate animated stars background
+  useEffect(() => {
+    const starArray = Array.from({ length: 50 }, () => ({
+      id: Math.random(),
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 2 + 0.5,
+      duration: Math.random() * 3 + 2,
+      delay: Math.random() * 2,
+    }));
+    setStars(starArray);
+  }, []);
+
+  const projects = [
+    {
+      title: "Class Availability Tracker",
+      description: "Real-time university course monitoring system that scrapes enrollment data and provides instant notifications when seats become available.",
+      tech: ["Python", "Playwright", "BeautifulSoup"],
+      highlights: [
+        "25% faster parse rates with optimized HTML parsing",
+        "Real-time notifications within 5 seconds of status changes",
+        "50% improvement in database access efficiency",
+        "State tracking to eliminate duplicate alerts"
+      ],
+      github: "https://github.com/AlexJawhari",
+      date: "September 2025"
+    },
+  ];
+
+  const skills = {
+    "Languages": ["C", "C++", "Java", "Python", "JavaScript", "HTML/CSS", "SQL", "Bash"],
+    "Backend & Tools": ["REST APIs", "Docker", "Git", "Linux", "Scripting"],
+    "Specialties": ["Web Scraping", "Data Automation", "Real-time Systems", "State Management"]
+  };
+
+  const experience = [
+    {
+      role: "Software Engineering Intern",
+      company: "Core Integrative Health",
+      date: "2025",
+      achievements: [
+        "Built patient financial tracking database with 40% improved callback rates",
+        "Automated email/phone workflows reducing late payments by 30%",
+        "Implemented error-checking routines reducing data entry mistakes by 25%"
+      ]
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#0f1419] via-[#1a1f2e] to-[#0f1419] text-gray-100 font-sans overflow-hidden">
+      {/* Animated Star Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        {stars.map(star => (
+          <div
+            key={star.id}
+            className="absolute bg-white rounded-full"
+            style={{
+              width: `${star.size}px`,
+              height: `${star.size}px`,
+              left: `${star.x}%`,
+              top: `${star.y}%`,
+              opacity: 0,
+              animation: `twinkle ${star.duration}s infinite`,
+              animationDelay: `${star.delay}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Navigation Bar */}
+      <nav className="sticky top-0 z-50 backdrop-blur-md bg-[#0f1419]/70 border-b border-[#b8860b]/20">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="text-2xl font-serif font-bold text-[#b8860b]">AJ</div>
+          
+          <div className="flex gap-1">
+            {[
+              { id: 'home', label: 'Home' },
+              { id: 'about', label: 'About' },
+              { id: 'projects', label: 'Projects' },
+              { id: 'contact', label: 'Contact' }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-6 py-2 font-medium transition-all duration-300 relative ${
+                  activeTab === tab.id
+                    ? 'text-[#b8860b]'
+                    : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                {tab.label}
+                {activeTab === tab.id && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#b8860b] to-transparent" />
+                )}
+              </button>
+            ))}
+          </div>
+
+          <a
+            href="#resume"
+            className="px-5 py-2 bg-[#b8860b]/20 hover:bg-[#b8860b]/30 text-[#b8860b] border border-[#b8860b]/50 rounded-lg transition-all duration-300 text-sm font-medium"
+          >
+            Resume
+          </a>
+        </div>
+      </nav>
+
+      {/* Content Container */}
+      <div className="relative z-10">
+        {/* HOME TAB */}
+        {activeTab === 'home' && (
+          <div className="animate-fadeIn max-w-6xl mx-auto px-6 py-24">
+            <div className="space-y-12">
+              {/* Hero */}
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <h1 className="text-7xl font-serif font-bold text-white leading-tight">
+                    Alexander Jawhari
+                  </h1>
+                  <p className="text-2xl text-[#b8860b]">Software Engineer</p>
+                </div>
+                <p className="text-lg text-gray-300 max-w-2xl leading-relaxed">
+                  Computer Science student at UT Dallas specializing in backend systems, automation, and real-time data processing. Passionate about building scalable solutions and optimizing complex workflows.
+                </p>
+              </div>
+
+              {/* Quick Stats */}
+              <div className="grid grid-cols-3 gap-6">
+                <div className="bg-[#1a1f2e]/60 backdrop-blur-sm border border-[#b8860b]/20 rounded-lg p-6 hover:border-[#b8860b]/50 transition-all duration-300">
+                  <Code2 className="w-8 h-8 text-[#b8860b] mb-3" />
+                  <p className="text-gray-400 text-sm mb-1">Languages</p>
+                  <p className="text-white font-semibold">8+ Languages</p>
+                </div>
+                <div className="bg-[#1a1f2e]/60 backdrop-blur-sm border border-[#b8860b]/20 rounded-lg p-6 hover:border-[#b8860b]/50 transition-all duration-300">
+                  <Zap className="w-8 h-8 text-[#b8860b] mb-3" />
+                  <p className="text-gray-400 text-sm mb-1">Expertise</p>
+                  <p className="text-white font-semibold">Backend & Automation</p>
+                </div>
+                <div className="bg-[#1a1f2e]/60 backdrop-blur-sm border border-[#b8860b]/20 rounded-lg p-6 hover:border-[#b8860b]/50 transition-all duration-300">
+                  <Brain className="w-8 h-8 text-[#b8860b] mb-3" />
+                  <p className="text-gray-400 text-sm mb-1">Focus</p>
+                  <p className="text-white font-semibold">Real-time Systems</p>
+                </div>
+              </div>
+
+              {/* CTA */}
+              <div className="pt-8">
+                <button
+                  onClick={() => setActiveTab('projects')}
+                  className="px-8 py-3 bg-gradient-to-r from-[#b8860b] to-[#a0740d] text-[#0f1419] font-semibold rounded-lg hover:shadow-lg hover:shadow-[#b8860b]/30 transition-all duration-300 transform hover:scale-105"
+                >
+                  Explore My Work →
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ABOUT TAB */}
+        {activeTab === 'about' && (
+          <div className="animate-fadeIn max-w-6xl mx-auto px-6 py-20">
+            <div className="space-y-16">
+              <div>
+                <h2 className="text-5xl font-serif font-bold text-white mb-6">About Me</h2>
+                <div className="space-y-6 text-gray-300 text-lg leading-relaxed">
+                  <p>
+                    I'm a Computer Science student at the University of Texas at Dallas with a passion for backend systems, automation, and solving complex technical problems. Since elementary school, I've been drawn to programming—initially out of curiosity, now out of genuine craftsmanship.
+                  </p>
+                  <p>
+                    My focus is on building efficient, scalable systems that work behind the scenes. Whether it's optimizing data pipelines, automating workflows, or developing real-time monitoring systems, I'm most engaged when tackling architectural challenges and performance improvements.
+                  </p>
+                  <p>
+                    Beyond engineering, I've developed strong communication and leadership skills through competitive debate and mentoring others. These experiences have shaped my ability to explain complex technical concepts clearly and collaborate effectively with teams.
+                  </p>
+                </div>
+              </div>
+
+              {/* Experience */}
+              <div>
+                <h3 className="text-3xl font-serif font-bold text-white mb-8">Experience</h3>
+                {experience.map((exp, idx) => (
+                  <div key={idx} className="bg-[#1a1f2e]/40 border border-[#b8860b]/20 rounded-lg p-8 mb-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h4 className="text-xl font-semibold text-white">{exp.role}</h4>
+                        <p className="text-[#b8860b]">{exp.company}</p>
+                      </div>
+                      <span className="text-gray-400 text-sm">{exp.date}</span>
+                    </div>
+                    <ul className="space-y-2">
+                      {exp.achievements.map((ach, i) => (
+                        <li key={i} className="text-gray-300 flex gap-3">
+                          <span className="text-[#b8860b] font-bold">▸</span>
+                          {ach}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+
+              {/* Skills */}
+              <div>
+                <h3 className="text-3xl font-serif font-bold text-white mb-8">Technical Skills</h3>
+                <div className="space-y-6">
+                  {Object.entries(skills).map(([category, items]) => (
+                    <div key={category}>
+                      <h4 className="text-lg font-semibold text-[#b8860b] mb-3">{category}</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {items.map((skill, idx) => (
+                          <span
+                            key={idx}
+                            className="px-4 py-2 bg-[#1a1f2e]/60 border border-[#b8860b]/30 rounded-full text-gray-300 text-sm hover:bg-[#1a1f2e] hover:border-[#b8860b]/60 transition-all duration-300"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PROJECTS TAB */}
+        {activeTab === 'projects' && (
+          <div className="animate-fadeIn max-w-6xl mx-auto px-6 py-20">
+            <h2 className="text-5xl font-serif font-bold text-white mb-12">Featured Projects</h2>
+            
+            <div className="space-y-8">
+              {projects.map((project, idx) => (
+                <div
+                  key={idx}
+                  className="group bg-[#1a1f2e]/50 border border-[#b8860b]/20 rounded-lg p-8 hover:border-[#b8860b]/60 hover:bg-[#1a1f2e]/80 transition-all duration-500 hover:shadow-lg hover:shadow-[#b8860b]/10"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-semibold text-white mb-2">{project.title}</h3>
+                      <p className="text-gray-400 text-sm mb-4">{project.date}</p>
+                      <p className="text-gray-300 text-lg mb-6">{project.description}</p>
+                    </div>
+                  </div>
+
+                  <div className="mb-6">
+                    <h4 className="text-sm font-semibold text-[#b8860b] mb-3 uppercase tracking-wide">Key Highlights</h4>
+                    <ul className="space-y-2">
+                      {project.highlights.map((highlight, i) => (
+                        <li key={i} className="text-gray-300 flex gap-3 text-sm">
+                          <span className="text-[#b8860b]">▸</span>
+                          {highlight}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {project.tech.map((tech, i) => (
+                      <span key={i} className="px-3 py-1 bg-[#b8860b]/10 text-[#b8860b] text-xs rounded-full border border-[#b8860b]/30">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-[#b8860b] hover:text-white transition-colors duration-300 font-medium"
+                  >
+                    View on GitHub
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-16 p-8 bg-gradient-to-r from-[#b8860b]/10 to-transparent border border-[#b8860b]/20 rounded-lg">
+              <p className="text-gray-300 text-center">
+                More projects coming soon as I continue building my portfolio. Check back for updates!
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* CONTACT TAB */}
+        {activeTab === 'contact' && (
+          <div className="animate-fadeIn max-w-6xl mx-auto px-6 py-20">
+            <h2 className="text-5xl font-serif font-bold text-white mb-12">Get In Touch</h2>
+            
+            <div className="max-w-2xl space-y-8">
+              <p className="text-lg text-gray-300 leading-relaxed">
+                I'm always interested in discussing new projects, opportunities, and ideas. Feel free to reach out through any of the channels below.
+              </p>
+
+              <div className="space-y-6">
+                <a
+                  href="mailto:alexjawhari00@gmail.com"
+                  className="group block bg-[#1a1f2e]/60 border border-[#b8860b]/20 rounded-lg p-8 hover:border-[#b8860b]/60 hover:bg-[#1a1f2e]/80 transition-all duration-300"
+                >
+                  <div className="flex items-center gap-4">
+                    <Mail className="w-8 h-8 text-[#b8860b] group-hover:scale-110 transition-transform duration-300" />
+                    <div>
+                      <p className="text-gray-400 text-sm mb-1">Email</p>
+                      <p className="text-white text-lg font-medium group-hover:text-[#b8860b] transition-colors duration-300">
+                        alexjawhari00@gmail.com
+                      </p>
+                    </div>
+                  </div>
+                </a>
+
+                <a
+                  href="https://github.com/AlexJawhari"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group block bg-[#1a1f2e]/60 border border-[#b8860b]/20 rounded-lg p-8 hover:border-[#b8860b]/60 hover:bg-[#1a1f2e]/80 transition-all duration-300"
+                >
+                  <div className="flex items-center gap-4">
+                    <Github className="w-8 h-8 text-[#b8860b] group-hover:scale-110 transition-transform duration-300" />
+                    <div>
+                      <p className="text-gray-400 text-sm mb-1">GitHub</p>
+                      <p className="text-white text-lg font-medium group-hover:text-[#b8860b] transition-colors duration-300">
+                        github.com/AlexJawhari
+                      </p>
+                    </div>
+                  </div>
+                </a>
+
+                <a
+                  href="https://linkedin.com/in/alexjawhari"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group block bg-[#1a1f2e]/60 border border-[#b8860b]/20 rounded-lg p-8 hover:border-[#b8860b]/60 hover:bg-[#1a1f2e]/80 transition-all duration-300"
+                >
+                  <div className="flex items-center gap-4">
+                    <Linkedin className="w-8 h-8 text-[#b8860b] group-hover:scale-110 transition-transform duration-300" />
+                    <div>
+                      <p className="text-gray-400 text-sm mb-1">LinkedIn</p>
+                      <p className="text-white text-lg font-medium group-hover:text-[#b8860b] transition-colors duration-300">
+                        linkedin.com/in/alexjawhari
+                      </p>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Custom CSS */}
+      <style>{`
+        @keyframes twinkle {
+          0%, 100% { opacity: 0; }
+          50% { opacity: 0.7; }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fadeIn {
+          animation: fadeIn 0.6s ease-out;
+        }
+
+        @font-face {
+          font-family: 'Georgia', serif;
+        }
+
+        .font-serif {
+          font-family: 'Georgia', 'Garamond', serif;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+<!DOCTYPE html>
+<html>
+<body>
+<h1>Hello World</h1>
+<p>I'm hosted with GitHub Pages.</p>
+
+  
+  <meta name="robots" content="noindex">
+</body>
+</html>
+
+-->
