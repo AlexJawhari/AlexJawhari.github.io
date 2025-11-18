@@ -141,14 +141,14 @@
 
 @keyframes shooting {
   0% {
-    transform: translate3d(-40%, 0, 0) rotate(-15deg);
+    transform: translate3d(-60vw, 0, 0) rotate(-15deg);
     opacity: 0;
   }
   10% {
     opacity: 1;
   }
   40% {
-    transform: translate3d(140%, 0, 0) rotate(-15deg);
+    transform: translate3d(160vw, 0, 0) rotate(-15deg);
     opacity: 0;
   }
   100% {
@@ -202,7 +202,7 @@
 
 /* Glassmorphism + components */
 .glass-panel {
-  background: linear-gradient(150deg, rgba(10, 12, 18, 0.96), rgba(8, 10, 15, 0.9) 40%, rgba(27, 18, 11, 0.85));
+  background: linear-gradient(150deg, rgba(5, 7, 12, 0.88), rgba(7, 9, 15, 0.82) 40%, rgba(20, 14, 9, 0.75));
   backdrop-filter: blur(32px);
   box-shadow:
     0 40px 120px rgba(0, 0, 0, 0.75),

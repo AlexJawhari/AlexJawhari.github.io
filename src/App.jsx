@@ -208,6 +208,33 @@ const SECTION_VARIANTS = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
 }
 
+// Pre-generate star positions so we can keep them stable and avoid stars overlapping planets
+const STAR_COUNT = 120
+const PLANET_ZONES = [
+  { top: 10, left: 88, radius: 12 }, // planet-1
+  { top: 88, left: 15, radius: 14 }, // planet-2
+  { top: 72, left: 78, radius: 14 } // planet-3
+]
+
+const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
+  const top = Math.random() * 100
+  const left = Math.random() * 100
+
+  const overlapsPlanet = PLANET_ZONES.some(zone => {
+    const dx = left - zone.left
+    const dy = top - zone.top
+    return Math.sqrt(dx * dx + dy * dy) < zone.radius
+  })
+
+  return {
+    id: idx,
+    top,
+    left,
+    delay: idx * 0.18,
+    hidden: overlapsPlanet
+  }
+})
+
 /* -------------------------------------------------------------------------- */
 /*                                UI components                               */
 /* -------------------------------------------------------------------------- */
@@ -241,13 +268,16 @@ const GlassCard = ({ children, className = '' }) => (
 
 const OrbitBackdrop = () => {
   const { scrollYProgress } = useScroll()
-  const starOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.6, 1, 0.85])
-  const orbitRotation = useTransform(scrollYProgress, [0, 1], [0, 32])
-  const auroraOffsetY = useTransform(scrollYProgress, [0, 1], [0, -180])
+  const starOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.5, 1, 0.7])
+  const orbitRotation = useTransform(scrollYProgress, [0, 1], [0, 90])
+  const auroraOffsetY = useTransform(scrollYProgress, [0, 1], [0, -260])
   const auroraOpacity = useTransform(scrollYProgress, [0, 0.3, 1], [0.9, 0.7, 0.4])
-  const planetY = useTransform(scrollYProgress, [0, 1], [0, 120])
-  const planetX = useTransform(scrollYProgress, [0, 1], [0, 80])
-  const planetYReverse = useTransform(scrollYProgress, [0, 1], [0, -90])
+  const planet1Y = useTransform(scrollYProgress, [0, 1], [0, 220])
+  const planet1X = useTransform(scrollYProgress, [0, 1], [0, -160])
+  const planet2Y = useTransform(scrollYProgress, [0, 1], [0, -260])
+  const planet2X = useTransform(scrollYProgress, [0, 1], [0, 140])
+  const planet3Y = useTransform(scrollYProgress, [0, 1], [0, 190])
+  const planet3X = useTransform(scrollYProgress, [0, 1], [0, 60])
 
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none">
@@ -256,14 +286,14 @@ const OrbitBackdrop = () => {
       <motion.div className="absolute inset-0 bg-grid" style={{ opacity: starOpacity }} />
       <div className="absolute inset-0 bg-noise opacity-40" />
       <div className="absolute inset-0 starfield">
-        {[...Array(90)].map((_, idx) => (
+        {STARS.filter(star => !star.hidden).map(star => (
           <span
-            key={idx}
+            key={star.id}
             className="star"
             style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${idx * 0.2}s`
+              top: `${star.top}%`,
+              left: `${star.left}%`,
+              animationDelay: `${star.delay}s`
             }}
           />
         ))}
@@ -273,7 +303,7 @@ const OrbitBackdrop = () => {
             className="shooting-star"
             style={{
               top: `${10 + idx * 22}%`,
-              left: `${-10 + idx * 20}%`,
+              left: `${-20 + idx * 10}%`,
               animationDelay: `${idx * 3.2}s`
             }}
           />
@@ -285,9 +315,9 @@ const OrbitBackdrop = () => {
         ))}
       </motion.div>
       <div className="absolute inset-0">
-        <motion.span className="planet planet-1" style={{ y: planetY, x: planetX }} />
-        <motion.span className="planet planet-2" style={{ y: planetYReverse, x: planetX }} />
-        <motion.span className="planet planet-3" style={{ y: planetYReverse, x: planetX }} />
+        <motion.span className="planet planet-1" style={{ y: planet1Y, x: planet1X }} />
+        <motion.span className="planet planet-2" style={{ y: planet2Y, x: planet2X }} />
+        <motion.span className="planet planet-3" style={{ y: planet3Y, x: planet3X }} />
       </div>
       <motion.div className="absolute inset-0 aurora" style={{ y: auroraOffsetY, opacity: auroraOpacity }} />
     </div>
