@@ -233,74 +233,63 @@ const SectionTitle = ({ eyebrow, title, description }) => (
   </div>
 )
 
-const GlassCard = ({ children, className = '', interactive = false }) => {
-  const MotionWrapper = interactive ? motion.div : 'div'
-  const motionProps = interactive
-    ? {
-        whileHover: { y: -6, rotateX: 2, rotateY: -2 },
-        whileTap: { y: -2, rotateX: 0, rotateY: 0 },
-        transition: { type: 'spring', stiffness: 220, damping: 22 }
-      }
-    : {}
-
-  return (
-    <MotionWrapper
-      className={`glass-panel border border-white/5 rounded-3xl p-6 md:p-8 relative overflow-hidden ${className}`}
-      style={interactive ? { transformPerspective: 1100 } : undefined}
-      {...motionProps}
-    >
-      {children}
-    </MotionWrapper>
-  )
-}
+const GlassCard = ({ children, className = '' }) => (
+  <div className={`glass-panel border border-white/5 rounded-3xl p-6 md:p-8 relative overflow-hidden ${className}`}>
+    {children}
+  </div>
+)
 
 const OrbitBackdrop = () => {
   const { scrollYProgress } = useScroll()
-  const planetY = useTransform(scrollYProgress, [0, 1], [0, 60])
-  const planetX = useTransform(scrollYProgress, [0, 1], [0, 40])
-  const planetYReverse = useTransform(scrollYProgress, [0, 1], [0, -40])
+  const starOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.6, 1, 0.85])
+  const orbitRotation = useTransform(scrollYProgress, [0, 1], [0, 32])
+  const auroraOffsetY = useTransform(scrollYProgress, [0, 1], [0, -180])
+  const auroraOpacity = useTransform(scrollYProgress, [0, 0.3, 1], [0.9, 0.7, 0.4])
+  const planetY = useTransform(scrollYProgress, [0, 1], [0, 120])
+  const planetX = useTransform(scrollYProgress, [0, 1], [0, 80])
+  const planetYReverse = useTransform(scrollYProgress, [0, 1], [0, -90])
 
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none">
       <div className="absolute inset-0 bg-[#040507]" />
-      <div className="absolute inset-0 bg-radial" />
-      <div className="absolute inset-0 bg-grid opacity-20" />
+      <motion.div className="absolute inset-0 bg-radial" style={{ opacity: 1 }} />
+      <motion.div className="absolute inset-0 bg-grid" style={{ opacity: starOpacity }} />
       <div className="absolute inset-0 bg-noise opacity-40" />
       <div className="absolute inset-0 starfield">
-        {[...Array(40)].map((_, idx) => (
+        {[...Array(90)].map((_, idx) => (
           <span
             key={idx}
             className="star"
             style={{
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
-              animationDelay: `${idx * 0.35}s`
+              animationDelay: `${idx * 0.2}s`
             }}
           />
         ))}
-        {[...Array(3)].map((_, idx) => (
+        {[...Array(4)].map((_, idx) => (
           <span
             key={`shoot-${idx}`}
             className="shooting-star"
             style={{
-              top: `${15 + idx * 25}%`,
-              left: `${10 + idx * 20}%`,
-              animationDelay: `${idx * 2.8}s`
+              top: `${10 + idx * 22}%`,
+              left: `${-10 + idx * 20}%`,
+              animationDelay: `${idx * 3.2}s`
             }}
           />
         ))}
       </div>
-      <div className="absolute inset-0">
+      <motion.div className="absolute inset-0" style={{ rotate: orbitRotation }}>
         {[...Array(6)].map((_, idx) => (
           <span key={idx} className={`orbit orbit-${idx + 1}`} />
         ))}
-      </div>
+      </motion.div>
       <div className="absolute inset-0">
         <motion.span className="planet planet-1" style={{ y: planetY, x: planetX }} />
         <motion.span className="planet planet-2" style={{ y: planetYReverse, x: planetX }} />
         <motion.span className="planet planet-3" style={{ y: planetYReverse, x: planetX }} />
       </div>
-      <div className="absolute inset-0 aurora" />
+      <motion.div className="absolute inset-0 aurora" style={{ y: auroraOffsetY, opacity: auroraOpacity }} />
     </div>
   )
 }
@@ -361,7 +350,7 @@ function Landing() {
 
       <section className="grid lg:grid-cols-3 gap-6">
         {CAPABILITIES.map(capability => (
-          <GlassCard key={capability.title} className="relative overflow-hidden" interactive>
+          <GlassCard key={capability.title} className="relative overflow-hidden">
             <h3 className="text-xl font-heading text-da-silver mb-3">{capability.title}</h3>
             <p className="text-sm text-da-silver/80 mb-5">{capability.text}</p>
             <div className="flex flex-wrap gap-2">
@@ -380,7 +369,7 @@ function Landing() {
         <div className="grid lg:grid-cols-2 gap-6">
           {heroProjects.map(project => (
             <Link key={project.slug} to={`/projects/${project.slug}`}>
-              <GlassCard className="project-card relative" interactive>
+              <GlassCard className="project-card relative">
                 <div className="relative z-10">
                   <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-da-silver/60 mb-3">
                     <span>{project.timeline}</span>
@@ -404,7 +393,7 @@ function Landing() {
       </section>
 
       <section className="grid lg:grid-cols-[2fr,1fr] gap-6">
-        <GlassCard interactive>
+        <GlassCard>
           <SectionTitle eyebrow="Philosophy" title="Design principles" />
           <ul className="space-y-4 text-da-silver/80">
             {PHILOSOPHY.map(item => (
@@ -415,7 +404,7 @@ function Landing() {
             ))}
           </ul>
         </GlassCard>
-        <GlassCard interactive>
+        <GlassCard>
           <SectionTitle eyebrow="Signal boost" title="Contact" />
           <div className="space-y-4 text-sm">
             <a className="contact-link" href={`mailto:${SITE.email}`}>
@@ -456,7 +445,7 @@ function AboutPage() {
 
       <section className="grid lg:grid-cols-3 gap-6">
         {TIMELINE.map(entry => (
-          <GlassCard key={entry.year} interactive>
+          <GlassCard key={entry.year}>
             <div className="text-xs uppercase tracking-[0.3em] text-da-gold/80">{entry.year}</div>
             <h3 className="text-xl font-heading text-da-silver mt-3">{entry.title}</h3>
             <ul className="mt-4 space-y-3 text-sm text-da-silver/80">
@@ -503,7 +492,7 @@ function ProjectsPage() {
             {filtered.map(project => (
               <motion.div key={project.slug} layout variants={SECTION_VARIANTS} initial="hidden" animate="visible" exit={{ opacity: 0, y: 10 }} transition={{ duration: 0.4 }}>
                 <Link to={`/projects/${project.slug}`}>
-                  <GlassCard className="project-tile" interactive>
+                  <GlassCard className="project-tile">
                     <div className="text-xs uppercase tracking-[0.3em] text-da-silver/60 flex justify-between">
                       <span>{project.timeline}</span>
                       <span>{project.status}</span>
@@ -570,7 +559,7 @@ function ProjectDetail() {
       </GlassCard>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <GlassCard interactive>
+        <GlassCard>
           <h3 className="text-xl font-heading text-da-silver mb-4">Highlights</h3>
           <ul className="space-y-3 text-sm text-da-silver/80">
             {project.highlights.map(item => (
@@ -581,7 +570,7 @@ function ProjectDetail() {
             ))}
           </ul>
         </GlassCard>
-        <GlassCard interactive>
+        <GlassCard>
           <h3 className="text-xl font-heading text-da-silver mb-4">Tech / tooling</h3>
           <div className="flex flex-wrap gap-3">
             {project.stack.map(item => (
@@ -629,7 +618,7 @@ function ResumePage() {
 function ContactPage() {
   return (
     <motion.div variants={SECTION_VARIANTS} initial="hidden" animate="visible" className="space-y-8">
-      <GlassCard interactive>
+      <GlassCard>
         <SectionTitle eyebrow="Contact" title="Direct links" description="No contact form — just precise channels." />
         <div className="grid md:grid-cols-3 gap-6">
           <a className="contact-card" href={`mailto:${SITE.email}`}>
