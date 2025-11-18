@@ -112,9 +112,9 @@
   width: 80px;
   height: 1px;
   background: linear-gradient(90deg, rgba(191, 160, 90, 0), rgba(191, 160, 90, 0.9));
-  opacity: 0.0;
+  opacity: 0;
   filter: blur(0.5px);
-  animation: shooting 8s linear infinite;
+  animation: shooting 9s linear infinite;
 }
 
 .shooting-star:nth-child(2) {
@@ -141,14 +141,14 @@
 
 @keyframes shooting {
   0% {
-    transform: translate3d(-20%, 0, 0);
+    transform: translate3d(-40%, 0, 0) rotate(-15deg);
     opacity: 0;
   }
   10% {
     opacity: 1;
   }
   40% {
-    transform: translate3d(120%, 0, 0);
+    transform: translate3d(140%, 0, 0) rotate(-15deg);
     opacity: 0;
   }
   100% {
