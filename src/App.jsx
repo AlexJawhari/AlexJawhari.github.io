@@ -72,6 +72,48 @@ const PROJECTS = [
     heroColor: '#2a375f'
   },
   {
+    slug: 'kyoto-observatory-console',
+    title: 'Kyoto Observatory Console',
+    tagline: 'Dark academia monitoring wall',
+    summary:
+      'A command-console style dashboard that watches background jobs, scrapers, and queues — rendered like an old observatory terminal with modern telemetry under the hood.',
+    narrative:
+      'Blends a low-noise, high-signal console UI with structured logs and anomaly pings. Inspired by observatories and old reading rooms: every event feels like a field note, not a notification storm.',
+    category: 'featured',
+    timeline: '2024',
+    status: 'Studio build',
+    stack: ['TypeScript', 'React', 'WebSockets', 'Postgres'],
+    highlights: [
+      'Signal-first log stream with semantic grouping',
+      'Room-inspired themes (library, observatory, midnight lab)',
+      'Keyboard-driven navigation for fast triage'
+    ],
+    repo: 'https://github.com/AlexJawhari',
+    notion: null,
+    heroColor: '#1b2738'
+  },
+  {
+    slug: 'ink-and-orbit-notes',
+    title: 'Ink & Orbit Notes',
+    tagline: 'Philosophical engineering notebook',
+    summary:
+      'A note system for stitching together research, experiments, and philosophical questions about systems — part digital commonplace book, part lab log.',
+    narrative:
+      'Organizes ideas as constellations: each experiment, quote, or system sketch links into a graph you can traverse like a star map. Built to keep both technical detail and why-it-matters in the same frame.',
+    category: 'featured',
+    timeline: '2023 – ongoing',
+    status: 'Personal tool',
+    stack: ['Next.js', 'SQLite', 'MDX'],
+    highlights: [
+      'Bidirectional links between experiments and essays',
+      'Night-mode reading room theme with marginalia',
+      'Lightweight sync so it works offline first'
+    ],
+    repo: 'https://github.com/AlexJawhari',
+    notion: null,
+    heroColor: '#262534'
+  },
+  {
     slug: 'senate-lattice',
     title: 'Senate Lattice',
     tagline: 'Public trading intelligence',
@@ -203,10 +245,31 @@ const OrbitBackdrop = () => (
     <div className="absolute inset-0 bg-radial" />
     <div className="absolute inset-0 bg-grid opacity-20" />
     <div className="absolute inset-0 bg-noise opacity-40" />
+    <div className="absolute inset-0 starfield">
+      {[...Array(40)].map((_, idx) => (
+        <span
+          key={idx}
+          className="star"
+          style={{
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            animationDelay: `${idx * 0.35}s`
+          }}
+        />
+      ))}
+      <span className="shooting-star" style={{ top: '30%' }} />
+      <span className="shooting-star" style={{ top: '60%' }} />
+      <span className="shooting-star" style={{ top: '15%' }} />
+    </div>
     <div className="absolute inset-0">
       {[...Array(6)].map((_, idx) => (
         <span key={idx} className={`orbit orbit-${idx + 1}`} />
       ))}
+    </div>
+    <div className="absolute inset-0">
+      <span className="planet planet-1" />
+      <span className="planet planet-2" />
+      <span className="planet planet-3" />
     </div>
     <div className="absolute inset-0 aurora" />
   </div>
@@ -523,8 +586,8 @@ function ResumePage() {
           </a>
         </div>
       </GlassCard>
-      <GlassCard className="min-h-[70vh]">
-        <iframe title="Resume PDF" src={SITE.resumeUrl} className="w-full h-[70vh] rounded-2xl border border-white/5" />
+      <GlassCard className="min-h-[80vh]">
+        <iframe title="Resume PDF" src={SITE.resumeUrl} className="w-full h-[80vh] rounded-2xl border border-white/5" />
       </GlassCard>
     </motion.div>
   )
