@@ -2,51 +2,182 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Local font faces - add woff2 files to public/fonts/ if available */
-@font-face {
-  font-family: 'EB Garamond';
-  src: url('/fonts/EB_Garamond-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Space Grotesk';
-  src: url('/fonts/SpaceGrotesk-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&family=Space+Grotesk:wght@400;500;600&display=swap');
+
+:root {
+  color-scheme: dark;
+  --da-bg: #050608;
+  --da-silver: #c5ced1;
+  --da-gold: #bfa05a;
+  --da-ink: rgba(255, 255, 255, 0.05);
 }
 
-:root{
-  --accent-silver: #bfc8c8;
-  --accent-gold: #bfa05a;
-  --accent-deep-blue: #071d3f;
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-[#050608] text-da-silver;
+    font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+  }
+
+  .font-heading {
+    font-family: 'EB Garamond', 'Garamond', serif;
+    letter-spacing: 0.04em;
+  }
+
+  ::selection {
+    background: rgba(191, 160, 90, 0.35);
+    color: #fff;
+  }
 }
 
-body{font-family: 'Space Grotesk', system-ui, sans-serif}
+/* Background textures */
+.bg-grid {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
 
-/* Starfield background (subtle) */
-.app-starfield {
-  position: fixed;
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  mix-blend-mode: screen;
+}
+
+.bg-radial {
+  background: radial-gradient(circle at top, rgba(25, 61, 87, 0.45), transparent 55%),
+    radial-gradient(circle at 20% 60%, rgba(9, 31, 25, 0.35), transparent 45%),
+    radial-gradient(circle at 80% 40%, rgba(45, 27, 68, 0.4), transparent 42%);
+}
+
+.aurora {
+  background: radial-gradient(circle at 15% 20%, rgba(118, 163, 255, 0.2), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(56, 235, 187, 0.18), transparent 45%);
+  filter: blur(60px);
+  mix-blend-mode: screen;
+}
+
+.orbit {
+  position: absolute;
+  border: 1px solid rgba(191, 160, 90, 0.08);
+  border-radius: 999px;
+  animation: orbitSpin 24s linear infinite;
+}
+
+.orbit-1 { width: 60%; height: 40%; top: 10%; left: 20%; }
+.orbit-2 { width: 45%; height: 60%; top: 20%; left: 40%; animation-duration: 30s; }
+.orbit-3 { width: 80%; height: 70%; top: 12%; left: 5%; animation-duration: 26s; }
+.orbit-4 { width: 55%; height: 40%; top: 30%; left: 30%; animation-duration: 32s; }
+.orbit-5 { width: 65%; height: 50%; top: 15%; left: 15%; animation-duration: 36s; }
+.orbit-6 { width: 70%; height: 60%; top: 5%; left: 20%; animation-duration: 40s; }
+
+@keyframes orbitSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Glassmorphism + components */
+.glass-panel {
+  background: linear-gradient(145deg, rgba(8, 10, 14, 0.92), rgba(5, 6, 8, 0.65));
+  backdrop-filter: blur(32px);
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.pill-cta {
+  @apply inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium text-black;
+  background: linear-gradient(120deg, rgba(191, 160, 90, 0.95), rgba(174, 139, 74, 0.8));
+  box-shadow: 0 0 30px rgba(191, 160, 90, 0.35);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pill-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 40px rgba(191, 160, 90, 0.45);
+}
+
+.pill-ghost {
+  @apply inline-flex items-center rounded-full px-5 py-2 text-sm font-medium text-da-silver/80 border border-white/10;
+  backdrop-filter: blur(8px);
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.pill-ghost:hover {
+  background: rgba(191, 160, 90, 0.08);
+  color: #fff;
+  border-color: rgba(191, 160, 90, 0.4);
+}
+
+.stat-pill {
+  @apply rounded-2xl px-4 py-4 border border-white/5;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tag {
+  @apply text-xs uppercase tracking-wide rounded-full px-3 py-1 text-da-silver/70;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tag-ghost {
+  background: rgba(191, 160, 90, 0.08);
+  border-color: rgba(191, 160, 90, 0.25);
+  color: rgba(191, 160, 90, 0.9);
+}
+
+.project-card {
+  min-height: 280px;
+}
+
+.orbital-accent {
+  position: absolute;
   inset: 0;
-  z-index: 0;
-  background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  opacity: 0.15;
-  pointer-events: none;
+  opacity: 0.18;
+  filter: blur(60px);
+  transform: rotate(8deg);
 }
 
-/* Card styles */
-.card-da{
-  background: linear-gradient(180deg, rgba(10,10,12,0.6), rgba(0,0,0,0.65));
-  border: 1px solid rgba(191,192,200,0.06);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+.contact-link {
+  display: block;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(197, 206, 209, 0.8);
+  transition: color 0.3s ease, transform 0.3s ease;
 }
 
-/* Fancy header style */
-.heading-da{
-  font-family: 'EB Garamond', serif;
-  letter-spacing: 0.02em;
+.contact-link:hover {
+  color: #fff;
+  transform: translateX(4px);
+}
+
+.tab {
+  @apply px-4 py-2 rounded-full text-xs uppercase tracking-[0.3em] border border-white/10 text-da-silver/60 transition;
+}
+
+.tab-active {
+  border-color: rgba(191, 160, 90, 0.5);
+  color: #fff;
+  box-shadow: 0 0 25px rgba(191, 160, 90, 0.2);
+}
+
+.contact-card {
+  @apply flex flex-col gap-2 rounded-3xl border border-white/5 p-5 transition;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.contact-card:hover {
+  border-color: rgba(191, 160, 90, 0.4);
+  transform: translateY(-2px);
+  color: #fff;
+}
+
+.project-tile {
+  min-height: 230px;
 }
 
