@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { Routes, Route, NavLink, Link, useParams, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 
 /* -------------------------------------------------------------------------- */
 /*                             Core portfolio data                            */
@@ -233,47 +233,77 @@ const SectionTitle = ({ eyebrow, title, description }) => (
   </div>
 )
 
-const GlassCard = ({ children, className = '' }) => (
-  <div className={`glass-panel border border-white/5 rounded-3xl p-6 md:p-8 relative overflow-hidden ${className}`}>
-    {children}
-  </div>
-)
+const GlassCard = ({ children, className = '', interactive = false }) => {
+  const MotionWrapper = interactive ? motion.div : 'div'
+  const motionProps = interactive
+    ? {
+        whileHover: { y: -6, rotateX: 2, rotateY: -2 },
+        whileTap: { y: -2, rotateX: 0, rotateY: 0 },
+        transition: { type: 'spring', stiffness: 220, damping: 22 }
+      }
+    : {}
 
-const OrbitBackdrop = () => (
-  <div className="fixed inset-0 -z-10 pointer-events-none">
-    <div className="absolute inset-0 bg-[#040507]" />
-    <div className="absolute inset-0 bg-radial" />
-    <div className="absolute inset-0 bg-grid opacity-20" />
-    <div className="absolute inset-0 bg-noise opacity-40" />
-    <div className="absolute inset-0 starfield">
-      {[...Array(40)].map((_, idx) => (
-        <span
-          key={idx}
-          className="star"
-          style={{
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            animationDelay: `${idx * 0.35}s`
-          }}
-        />
-      ))}
-      <span className="shooting-star" style={{ top: '30%' }} />
-      <span className="shooting-star" style={{ top: '60%' }} />
-      <span className="shooting-star" style={{ top: '15%' }} />
+  return (
+    <MotionWrapper
+      className={`glass-panel border border-white/5 rounded-3xl p-6 md:p-8 relative overflow-hidden ${className}`}
+      style={interactive ? { transformPerspective: 1100 } : undefined}
+      {...motionProps}
+    >
+      {children}
+    </MotionWrapper>
+  )
+}
+
+const OrbitBackdrop = () => {
+  const { scrollYProgress } = useScroll()
+  const planetY = useTransform(scrollYProgress, [0, 1], [0, 60])
+  const planetX = useTransform(scrollYProgress, [0, 1], [0, 40])
+  const planetYReverse = useTransform(scrollYProgress, [0, 1], [0, -40])
+
+  return (
+    <div className="fixed inset-0 -z-10 pointer-events-none">
+      <div className="absolute inset-0 bg-[#040507]" />
+      <div className="absolute inset-0 bg-radial" />
+      <div className="absolute inset-0 bg-grid opacity-20" />
+      <div className="absolute inset-0 bg-noise opacity-40" />
+      <div className="absolute inset-0 starfield">
+        {[...Array(40)].map((_, idx) => (
+          <span
+            key={idx}
+            className="star"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${idx * 0.35}s`
+            }}
+          />
+        ))}
+        {[...Array(3)].map((_, idx) => (
+          <span
+            key={`shoot-${idx}`}
+            className="shooting-star"
+            style={{
+              top: `${15 + idx * 25}%`,
+              left: `${10 + idx * 20}%`,
+              animationDelay: `${idx * 2.8}s`
+            }}
+          />
+        ))}
+      </div>
+      <div className="absolute inset-0">
+        {[...Array(6)].map((_, idx) => (
+          <span key={idx} className={`orbit orbit-${idx + 1}`} />
+        ))}
+      </div>
+      <div className="absolute inset-0">
+        <motion.span className="planet planet-1" style={{ y: planetY, x: planetX }} />
+        <motion.span className="planet planet-2" style={{ y: planetYReverse, x: planetX }} />
+        <motion.span className="planet planet-3" style={{ y: planetYReverse, x: planetX }} />
+      </div>
+      <div className="absolute inset-0 aurora" />
     </div>
-    <div className="absolute inset-0">
-      {[...Array(6)].map((_, idx) => (
-        <span key={idx} className={`orbit orbit-${idx + 1}`} />
-      ))}
-    </div>
-    <div className="absolute inset-0">
-      <span className="planet planet-1" />
-      <span className="planet planet-2" />
-      <span className="planet planet-3" />
-    </div>
-    <div className="absolute inset-0 aurora" />
-  </div>
-)
+  )
+}
 
 /* -------------------------------------------------------------------------- */
 /*                                 Page: home                                 */
@@ -331,7 +361,7 @@ function Landing() {
 
       <section className="grid lg:grid-cols-3 gap-6">
         {CAPABILITIES.map(capability => (
-          <GlassCard key={capability.title} className="relative overflow-hidden">
+          <GlassCard key={capability.title} className="relative overflow-hidden" interactive>
             <h3 className="text-xl font-heading text-da-silver mb-3">{capability.title}</h3>
             <p className="text-sm text-da-silver/80 mb-5">{capability.text}</p>
             <div className="flex flex-wrap gap-2">
@@ -350,7 +380,7 @@ function Landing() {
         <div className="grid lg:grid-cols-2 gap-6">
           {heroProjects.map(project => (
             <Link key={project.slug} to={`/projects/${project.slug}`}>
-              <GlassCard className="project-card relative">
+              <GlassCard className="project-card relative" interactive>
                 <div className="relative z-10">
                   <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-da-silver/60 mb-3">
                     <span>{project.timeline}</span>
@@ -374,7 +404,7 @@ function Landing() {
       </section>
 
       <section className="grid lg:grid-cols-[2fr,1fr] gap-6">
-        <GlassCard>
+        <GlassCard interactive>
           <SectionTitle eyebrow="Philosophy" title="Design principles" />
           <ul className="space-y-4 text-da-silver/80">
             {PHILOSOPHY.map(item => (
@@ -385,7 +415,7 @@ function Landing() {
             ))}
           </ul>
         </GlassCard>
-        <GlassCard>
+        <GlassCard interactive>
           <SectionTitle eyebrow="Signal boost" title="Contact" />
           <div className="space-y-4 text-sm">
             <a className="contact-link" href={`mailto:${SITE.email}`}>
@@ -426,7 +456,7 @@ function AboutPage() {
 
       <section className="grid lg:grid-cols-3 gap-6">
         {TIMELINE.map(entry => (
-          <GlassCard key={entry.year}>
+          <GlassCard key={entry.year} interactive>
             <div className="text-xs uppercase tracking-[0.3em] text-da-gold/80">{entry.year}</div>
             <h3 className="text-xl font-heading text-da-silver mt-3">{entry.title}</h3>
             <ul className="mt-4 space-y-3 text-sm text-da-silver/80">
@@ -473,7 +503,7 @@ function ProjectsPage() {
             {filtered.map(project => (
               <motion.div key={project.slug} layout variants={SECTION_VARIANTS} initial="hidden" animate="visible" exit={{ opacity: 0, y: 10 }} transition={{ duration: 0.4 }}>
                 <Link to={`/projects/${project.slug}`}>
-                  <GlassCard className="project-tile">
+                  <GlassCard className="project-tile" interactive>
                     <div className="text-xs uppercase tracking-[0.3em] text-da-silver/60 flex justify-between">
                       <span>{project.timeline}</span>
                       <span>{project.status}</span>
@@ -540,7 +570,7 @@ function ProjectDetail() {
       </GlassCard>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <GlassCard>
+        <GlassCard interactive>
           <h3 className="text-xl font-heading text-da-silver mb-4">Highlights</h3>
           <ul className="space-y-3 text-sm text-da-silver/80">
             {project.highlights.map(item => (
@@ -551,7 +581,7 @@ function ProjectDetail() {
             ))}
           </ul>
         </GlassCard>
-        <GlassCard>
+        <GlassCard interactive>
           <h3 className="text-xl font-heading text-da-silver mb-4">Tech / tooling</h3>
           <div className="flex flex-wrap gap-3">
             {project.stack.map(item => (
@@ -586,8 +616,8 @@ function ResumePage() {
           </a>
         </div>
       </GlassCard>
-      <GlassCard className="min-h-[80vh]">
-        <iframe title="Resume PDF" src={SITE.resumeUrl} className="w-full h-[80vh] rounded-2xl border border-white/5" />
+      <GlassCard className="min-h-[90vh]">
+        <iframe title="Resume PDF" src={SITE.resumeUrl} className="w-full h-[90vh] rounded-2xl border border-white/5" />
       </GlassCard>
     </motion.div>
   )
@@ -599,7 +629,7 @@ function ResumePage() {
 function ContactPage() {
   return (
     <motion.div variants={SECTION_VARIANTS} initial="hidden" animate="visible" className="space-y-8">
-      <GlassCard>
+      <GlassCard interactive>
         <SectionTitle eyebrow="Contact" title="Direct links" description="No contact form — just precise channels." />
         <div className="grid md:grid-cols-3 gap-6">
           <a className="contact-card" href={`mailto:${SITE.email}`}>
