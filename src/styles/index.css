@@ -4,14 +4,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&family=Space+Grotesk:wght@400;500;600&display=swap');
 
-:root {
-  color-scheme: dark;
-  --da-bg: #050608;
-  --da-silver: #c5ced1;
-  --da-gold: #bfa05a;
-  --da-ink: rgba(255, 255, 255, 0.05);
-}
-
 @layer base {
   * {
     box-sizing: border-box;
@@ -48,9 +40,11 @@
 }
 
 .bg-radial {
-  background: radial-gradient(circle at top, rgba(25, 61, 87, 0.45), transparent 55%),
-    radial-gradient(circle at 20% 60%, rgba(9, 31, 25, 0.35), transparent 45%),
-    radial-gradient(circle at 80% 40%, rgba(45, 27, 68, 0.4), transparent 42%);
+  background:
+    radial-gradient(circle at top, rgba(14, 32, 71, 0.65), transparent 55%),
+    radial-gradient(circle at 20% 60%, rgba(12, 42, 33, 0.5), transparent 45%),
+    radial-gradient(circle at 75% 35%, rgba(48, 31, 76, 0.55), transparent 42%),
+    radial-gradient(circle at 50% 100%, rgba(52, 34, 24, 0.6), transparent 50%);
 }
 
 .aurora {
@@ -83,11 +77,137 @@
   }
 }
 
+/* Starfield + planets (space as design, not text) */
+.starfield {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+  opacity: 0.3;
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+.star:nth-child(3n) {
+  width: 3px;
+  height: 3px;
+  opacity: 0.5;
+  animation-duration: 5.5s;
+}
+
+.star:nth-child(5n) {
+  opacity: 0.15;
+  animation-duration: 7s;
+}
+
+.shooting-star {
+  position: absolute;
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(191, 160, 90, 0), rgba(191, 160, 90, 0.9));
+  opacity: 0.0;
+  filter: blur(0.5px);
+  animation: shooting 8s linear infinite;
+}
+
+.shooting-star:nth-child(2) {
+  animation-delay: 3s;
+  top: 18%;
+}
+
+.shooting-star:nth-child(3) {
+  animation-delay: 5.5s;
+  top: 72%;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes shooting {
+  0% {
+    transform: translate3d(-20%, 0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  40% {
+    transform: translate3d(120%, 0, 0);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.planet {
+  position: absolute;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 20%, #f7f3e8, #7f8a9a 40%, #151822 75%);
+  box-shadow:
+    0 0 40px rgba(126, 139, 158, 0.65),
+    0 0 120px rgba(0, 0, 0, 0.9);
+  opacity: 0.45;
+  animation: planetFloat 26s ease-in-out infinite;
+}
+
+.planet-1 {
+  width: 120px;
+  height: 120px;
+  top: 8%;
+  right: 10%;
+}
+
+.planet-2 {
+  width: 80px;
+  height: 80px;
+  bottom: 12%;
+  left: 12%;
+  background: radial-gradient(circle at 25% 18%, #e6f5f0, #50a688 45%, #081914 80%);
+}
+
+.planet-3 {
+  width: 100px;
+  height: 100px;
+  bottom: 30%;
+  right: 25%;
+  background: radial-gradient(circle at 20% 15%, #f5efe6, #bfa05a 45%, #18130b 80%);
+}
+
+@keyframes planetFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(12px, -10px, 0);
+  }
+}
+
 /* Glassmorphism + components */
 .glass-panel {
-  background: linear-gradient(145deg, rgba(8, 10, 14, 0.92), rgba(5, 6, 8, 0.65));
+  background: linear-gradient(150deg, rgba(10, 12, 18, 0.96), rgba(8, 10, 15, 0.9) 40%, rgba(27, 18, 11, 0.85));
   backdrop-filter: blur(32px);
-  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  box-shadow:
+    0 40px 120px rgba(0, 0, 0, 0.75),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+    0 0 40px rgba(18, 30, 61, 0.4);
 }
 
 .pill-cta {
