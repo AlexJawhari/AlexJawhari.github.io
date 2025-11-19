@@ -216,7 +216,7 @@ const PLANET_ZONES = [
   { top: 72, left: 78, radius: 14 } // planet-3
 ]
 
-const STAR_PALETTE = ['#271002', '#E2A128', '#122E40', '#283121', '#D5D7D7']
+const STAR_PALETTE = ['#271002', '#9B081C', '#E2A128', '#122E40', '#283121', '#D5D7D7']
 const DEFAULT_STAR_COLOR = '#D5D7D7'
 
 const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
@@ -276,72 +276,10 @@ const PLANETS = [
   }
 ]
 
-// Constellation data - Capricorn (Dec 22 birthday) + other space constellations
-// Sized and positioned like orbit rings, with constellation patterns inside
-const CONSTELLATIONS = [
-  {
-    name: 'Capricorn',
-    points: [
-      [30, 20], [35, 25], [40, 23], [45, 27], [50, 25], [55, 30], [60, 27], [65, 33], [70, 30]
-    ],
-    size: { width: '60%', height: '40%' },
-    position: { top: '10%', left: '20%' },
-    duration: 24
-  },
-  {
-    name: 'Orion',
-    points: [
-      [40, 25], [45, 20], [50, 25], [55, 30], [60, 25], [65, 20], [70, 25], [60, 35], [60, 45]
-    ],
-    size: { width: '45%', height: '60%' },
-    position: { top: '20%', left: '40%' },
-    duration: 30
-  },
-  {
-    name: 'Cassiopeia',
-    points: [
-      [25, 35], [35, 30], [45, 40], [55, 35], [65, 45], [75, 40], [85, 50]
-    ],
-    size: { width: '80%', height: '70%' },
-    position: { top: '12%', left: '5%' },
-    duration: 26
-  },
-  {
-    name: 'Ursa Major',
-    points: [
-      [30, 45], [35, 40], [40, 45], [45, 40], [50, 45], [55, 50], [60, 45], [65, 55]
-    ],
-    size: { width: '55%', height: '40%' },
-    position: { top: '30%', left: '30%' },
-    duration: 32
-  },
-  {
-    name: 'Lyra',
-    points: [
-      [45, 55], [50, 50], [55, 55], [60, 60], [55, 65], [50, 60]
-    ],
-    size: { width: '65%', height: '50%' },
-    position: { top: '15%', left: '15%' },
-    duration: 36
-  },
-  {
-    name: 'Cygnus',
-    points: [
-      [55, 65], [60, 60], [65, 65], [70, 70], [75, 65], [80, 70], [85, 65]
-    ],
-    size: { width: '70%', height: '60%' },
-    position: { top: '5%', left: '20%' },
-    duration: 40
-  }
-]
-
 // Comet color palette - using the site's color palette
 const COMET_COLORS = [
-  { head: 'rgba(226, 161, 40, 0.9)', tail: 'rgba(226, 161, 40, 0.45)', rgb: '226, 161, 40' }, // Gold
-  { head: 'rgba(213, 215, 215, 0.85)', tail: 'rgba(213, 215, 215, 0.4)', rgb: '213, 215, 215' }, // Silver
-  { head: 'rgba(18, 46, 64, 0.9)', tail: 'rgba(18, 46, 64, 0.45)', rgb: '18, 46, 64' }, // Deep blue
-  { head: 'rgba(40, 49, 33, 0.9)', tail: 'rgba(40, 49, 33, 0.45)', rgb: '40, 49, 33' }, // Deep green
-  { head: 'rgba(39, 16, 2, 0.9)', tail: 'rgba(39, 16, 2, 0.45)', rgb: '39, 16, 2' } // Deep brown
+  { head: 'rgba(213, 215, 215, 0.9)', tail: 'rgba(213, 215, 215, 0.45)', rgb: '213, 215, 215' }, // Silver
+  { head: 'rgba(18, 46, 64, 0.9)', tail: 'rgba(18, 46, 64, 0.45)', rgb: '18, 46, 64' } // Deep blue
 ]
 
 // Comet generator - creates infrequent, slow, soft comets
@@ -362,12 +300,10 @@ const generateComet = (id) => {
   const angle = Math.atan2(dy, dx) * (180 / Math.PI)
   
   // Slow movement with variance - all relatively slow
-  const baseDuration = 8 // Base slow duration
-  const variance = 4 + Math.random() * 6 // 4-10 seconds variance
-  const duration = baseDuration + variance // 12-18 seconds total (all relatively slow)
+  const duration = 14 + Math.random() * 8 // 14-22 seconds
   
-  // Shorter delay between comets (more frequent)
-  const delay = Math.random() * 8 + 3 // 3-11 seconds delay
+  // Moderate delay between comets
+  const delay = 5 + Math.random() * 6 // 5-11 seconds delay
   
   // Random color from palette
   const color = COMET_COLORS[Math.floor(Math.random() * COMET_COLORS.length)]
@@ -509,7 +445,7 @@ const OrbitBackdrop = () => {
               duration: comet.duration,
               delay: comet.delay,
               repeat: Infinity,
-              repeatDelay: 5 + Math.random() * 10, // Shorter delays between repeats
+              repeatDelay: 8 + Math.random() * 8, // Slower repeats
               ease: 'easeInOut', // Softer easing
               times: [0, 0.15, 0.85, 1]
             }}
@@ -543,54 +479,9 @@ const OrbitBackdrop = () => {
           </motion.div>
         ))}
       </div>
-      {/* Constellations - sized and positioned like orbit rings, with proper aspect ratio */}
-      {/* To switch back to geometric orbit rings, replace CONSTELLATIONS with: 
-          {[...Array(6)].map((_, idx) => (
-            <span key={idx} className={`orbit orbit-${idx + 1}`} />
-          ))} */}
       <motion.div className="absolute inset-0" style={{ rotate: orbitRotation }}>
-        {CONSTELLATIONS.map((constellation, idx) => (
-          <div
-            key={constellation.name}
-            className="constellation-container"
-            style={{
-              position: 'absolute',
-              top: constellation.position.top,
-              left: constellation.position.left,
-              width: constellation.size.width,
-              height: constellation.size.height,
-              pointerEvents: 'none'
-            }}
-          >
-            <svg
-              className="constellation"
-              style={{
-                width: '100%',
-                height: '100%',
-                opacity: 0.12
-              }}
-              viewBox="0 0 100 100"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              <polyline
-                points={constellation.points.map(([x, y]) => `${x},${y}`).join(' ')}
-                fill="none"
-                stroke="rgba(191, 160, 90, 0.15)"
-                strokeWidth="0.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              {constellation.points.map(([x, y], pointIdx) => (
-                <circle
-                  key={pointIdx}
-                  cx={x}
-                  cy={y}
-                  r="1.2"
-                  fill="rgba(191, 160, 90, 0.4)"
-                />
-              ))}
-            </svg>
-          </div>
+        {[...Array(6)].map((_, idx) => (
+          <span key={idx} className={`orbit orbit-${idx + 1}`} />
         ))}
       </motion.div>
       <div className="absolute inset-0" style={{ zIndex: 10 }}>

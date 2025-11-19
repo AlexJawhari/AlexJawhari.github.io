@@ -54,17 +54,6 @@
   mix-blend-mode: screen;
 }
 
-/* Constellation styling - currently using actual constellations (Capricorn + others) */
-/* To switch back to geometric orbit rings, replace the CONSTELLATIONS array in App.jsx 
-   with the old orbit ring implementation */
-.constellation-container {
-  transform-origin: center center;
-}
-
-.constellation {
-  filter: drop-shadow(0 0 2px rgba(191, 160, 90, 0.2));
-}
-
 /* Old orbit rings - kept for reference if switching back */
 .orbit {
   position: absolute;
@@ -176,14 +165,15 @@
 
 .comet-tail {
   position: absolute;
-  width: 560px;
-  height: 4px;
+  width: 220px;
+  height: 6px;
   left: 50%;
   top: 50%;
   transform: translate(-100%, -50%);
-  filter: blur(2px);
+  filter: blur(1.2px);
   z-index: 1;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+  clip-path: polygon(0 50%, 100% 0, 100% 100%);
+  border-radius: 999px 0 0 999px;
 }
 
 @keyframes twinkle {
