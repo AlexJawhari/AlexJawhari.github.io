@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useState, useEffect, useRef } from 'react'
 import { Routes, Route, NavLink, Link, useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion'
 
@@ -219,6 +219,11 @@ const PLANET_ZONES = [
 const STAR_PALETTE = ['#271002', '#9B081C', '#E2A128', '#122E40', '#283121', '#D5D7D7']
 const DEFAULT_STAR_COLOR = '#D5D7D7'
 
+const SHOOTING_STAR_COLORS = [
+  { head: 'rgba(213, 215, 215, 0.9)', tail: 'rgba(213, 215, 215, 0.45)', rgb: '213, 215, 215' },
+  { head: 'rgba(18, 46, 64, 0.9)', tail: 'rgba(18, 46, 64, 0.45)', rgb: '18, 46, 64' }
+]
+
 const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
   // Add more stars in top right corner (75-100% top, 70-100% left)
   let top, left
@@ -277,50 +282,162 @@ const PLANETS = [
   }
 ]
 
-// Comet color palette - using the site's color palette
-const COMET_COLORS = [
-  { head: 'rgba(213, 215, 215, 0.9)', tail: 'rgba(213, 215, 215, 0.45)', rgb: '213, 215, 215' }, // Silver
-  { head: 'rgba(18, 46, 64, 0.9)', tail: 'rgba(18, 46, 64, 0.45)', rgb: '18, 46, 64' } // Deep blue
-]
+const MAX_SHOOTING_STARS = 3
+const SHOOTING_STAR_MIN_SPEED = 0.8
+const SHOOTING_STAR_MAX_SPEED = 1.6
+const SHOOTING_STAR_MIN_DELAY = 1600
+const SHOOTING_STAR_MAX_DELAY = 3200
 
-// Comet generator - creates infrequent, slow, soft comets
-const generateComet = (id) => {
-  // Random start position (off-screen)
-  const startSide = Math.random() < 0.5 ? 'left' : 'right'
-  const startTop = Math.random() * 100 // 0-100%
-  const startLeft = startSide === 'left' ? -10 : 110 // Off-screen
-  
-  // Random end position (off-screen or fade out)
-  const endSide = Math.random() < 0.5 ? 'left' : 'right'
-  const endTop = Math.random() * 100
-  const endLeft = endSide === 'left' ? -10 : 110
-  
-  // Calculate angle for tail alignment
-  const dx = endLeft - startLeft
-  const dy = endTop - startTop
-  const angle = Math.atan2(dy, dx) * (180 / Math.PI)
-  
-  // Slow movement with variance - all relatively slow
-  const duration = 18 + Math.random() * 10 // 18-28 seconds
+const createShootingStar = () => {
+  if (typeof window === 'undefined') return null
+  const side = Math.floor(Math.random() * 4)
+  const { innerWidth, innerHeight } = window
+  const offsetX = Math.random() * innerWidth
+  const offsetY = Math.random() * innerHeight
+  let startX = 0
+  let startY = 0
+  let angle = 45
 
-  // Moderate delay between comets
-  const delay = 8 + Math.random() * 8 // 8-16 seconds delay
+  switch (side) {
+    case 0:
+      startX = offsetX
+      startY = -20
+      angle = 45
+      break
+    case 1:
+      startX = innerWidth + 20
+      startY = offsetY
+      angle = 135
+      break
+    case 2:
+      startX = offsetX
+      startY = innerHeight + 20
+      angle = 225
+      break
+    case 3:
+    default:
+      startX = -20
+      startY = offsetY
+      angle = 315
+      break
+  }
 
-  // Random color from palette
-  const color = COMET_COLORS[Math.floor(Math.random() * COMET_COLORS.length)]
+  const color = SHOOTING_STAR_COLORS[Math.floor(Math.random() * SHOOTING_STAR_COLORS.length)]
 
   return {
-    id,
-    startX: startLeft,
-    startY: startTop,
-    endX: endLeft,
-    endY: endTop,
+    id: `${Date.now()}-${Math.random()}`,
+    x: startX,
+    y: startY,
     angle,
-    duration,
-    delay,
+    speed: SHOOTING_STAR_MIN_SPEED + Math.random() * (SHOOTING_STAR_MAX_SPEED - SHOOTING_STAR_MIN_SPEED),
+    distance: 0,
+    scale: 1,
     color,
     tailLength: 25 + Math.random() * 25
   }
+}
+
+const ShootingStarsLayer = () => {
+  const [stars, setStars] = useState([])
+  const spawnTimeout = useRef(null)
+  const animationFrame = useRef(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const scheduleSpawn = () => {
+      spawnTimeout.current = window.setTimeout(() => {
+        setStars(prev => {
+          if (prev.length >= MAX_SHOOTING_STARS) return prev
+          const next = createShootingStar()
+          if (!next) return prev
+          return [...prev, next]
+        })
+        scheduleSpawn()
+      }, SHOOTING_STAR_MIN_DELAY + Math.random() * (SHOOTING_STAR_MAX_DELAY - SHOOTING_STAR_MIN_DELAY))
+    }
+
+    scheduleSpawn()
+
+    return () => {
+      if (spawnTimeout.current) window.clearTimeout(spawnTimeout.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const animate = () => {
+      setStars(prev =>
+        prev
+          .map(star => {
+            const radians = (star.angle * Math.PI) / 180
+            const newX = star.x + star.speed * Math.cos(radians)
+            const newY = star.y + star.speed * Math.sin(radians)
+            const distance = star.distance + star.speed
+            const scale = 1 + distance / 600
+
+            if (
+              newX < -80 ||
+              newX > window.innerWidth + 80 ||
+              newY < -80 ||
+              newY > window.innerHeight + 80
+            ) {
+              return null
+            }
+
+            return { ...star, x: newX, y: newY, distance, scale }
+          })
+          .filter(Boolean)
+      )
+      animationFrame.current = requestAnimationFrame(animate)
+    }
+
+    animationFrame.current = requestAnimationFrame(animate)
+
+    return () => {
+      if (animationFrame.current) cancelAnimationFrame(animationFrame.current)
+    }
+  }, [])
+
+  return (
+    <div className="absolute inset-0">
+      {stars.map(star => (
+        <div
+          key={star.id}
+          className="comet-container"
+          style={{
+            transform: `translate(${star.x}px, ${star.y}px) rotate(${star.angle}deg) scale(${star.scale})`
+          }}
+        >
+          <div
+            className="comet-tail"
+            style={{
+              width: `${star.tailLength}px`,
+              background: `linear-gradient(
+                to right,
+                rgba(${star.color.rgb}, 0.8) 0%,
+                rgba(${star.color.rgb}, 0.5) 35%,
+                rgba(${star.color.rgb}, 0.2) 70%,
+                rgba(${star.color.rgb}, 0) 100%
+              )`
+            }}
+          />
+          <div
+            className="comet-head"
+            style={{
+              background: star.color.head,
+              boxShadow: `
+                0 0 8px ${star.color.head},
+                0 0 18px ${star.color.tail},
+                0 0 26px ${star.color.tail}
+              `
+            }}
+          />
+        </div>
+      ))}
+    </div>
+  )
 }
 
 /* -------------------------------------------------------------------------- */
@@ -376,26 +493,6 @@ const OrbitBackdrop = () => {
     y: useTransform(smoothScroll, [0, 1], planet.yRange)
   }))
   
-  // Generate more comets (more frequent)
-  const [comets, setComets] = useState(() => 
-    Array.from({ length: 5 }, (_, i) => generateComet(i))
-  )
-  
-  // Regenerate comets more frequently
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setComets(prev => prev.map((comet, i) => {
-        // Regenerate more often (more frequent)
-        if (Math.random() < 0.4) {
-          return generateComet(i)
-        }
-        return comet
-      }))
-    }, 15000) // Every 15 seconds (more frequent)
-    
-    return () => clearInterval(interval)
-  }, [])
-
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none">
       <div className="absolute inset-0 bg-[#040507]" />
@@ -424,61 +521,7 @@ const OrbitBackdrop = () => {
             />
           )
         })}
-        {/* Dynamic comets with aligned tails - infrequent, slow, soft colors */}
-        {comets.map(comet => (
-          <motion.div
-            key={comet.id}
-            className="comet-container"
-            style={{
-              left: `${comet.startX}%`,
-              top: `${comet.startY}%`,
-              rotate: `${comet.angle}deg`
-            }}
-            initial={{ 
-              x: 0, 
-              y: 0, 
-              opacity: 0 
-            }}
-            animate={{
-              x: `${comet.endX - comet.startX}vw`,
-              y: `${comet.endY - comet.startY}vh`,
-              opacity: [0, 0.6, 0.6, 0] // Softer opacity
-            }}
-            transition={{
-              duration: comet.duration,
-              delay: comet.delay,
-              repeat: Infinity,
-              repeatDelay: 8 + Math.random() * 8, // Slower repeats
-              ease: 'easeInOut', // Softer easing
-              times: [0, 0.15, 0.85, 1]
-            }}
-          >
-            <div 
-              className="comet-tail" 
-              style={{
-                width: `${comet.tailLength}px`,
-                background: `linear-gradient(
-                  to right,
-                  rgba(${comet.color.rgb}, 0.8) 0%,
-                  rgba(${comet.color.rgb}, 0.5) 40%,
-                  rgba(${comet.color.rgb}, 0.2) 75%,
-                  rgba(${comet.color.rgb}, 0) 100%
-                )`
-              }}
-            />
-            <div 
-              className="comet-head" 
-              style={{
-                background: comet.color.head,
-                boxShadow: `
-                  0 0 8px ${comet.color.head},
-                  0 0 18px ${comet.color.tail},
-                  0 0 26px ${comet.color.tail}
-                `
-              }}
-            />
-          </motion.div>
-        ))}
+        <ShootingStarsLayer />
       </div>
       <motion.div className="absolute inset-0" style={{ rotate: orbitRotation }}>
         {[...Array(6)].map((_, idx) => (
