@@ -473,18 +473,23 @@ const OrbitBackdrop = () => {
       {/* Grid temporarily removed */}
       <div className="absolute inset-0 bg-noise opacity-40" />
       <div className="absolute inset-0 starfield">
-        {STARS.filter(star => !star.hidden).map(star => (
-          <span
-            key={star.id}
-            className={star.hasColor ? 'star star-colored' : 'star'}
-            style={{
-              top: `${star.top}%`,
-              left: `${star.left}%`,
-              animationDelay: `${star.delay}s`,
-              ...(star.hasColor && star.color ? { '--star-color': star.color } : {})
-            }}
-          />
-        ))}
+        {STARS.filter(star => !star.hidden).map(star => {
+          const style = {
+            top: `${star.top}%`,
+            left: `${star.left}%`,
+            animationDelay: `${star.delay}s`
+          }
+          if (star.hasColor && star.color) {
+            style['--star-color'] = star.color
+          }
+          return (
+            <span
+              key={star.id}
+              className={star.hasColor ? 'star star-colored' : 'star'}
+              style={style}
+            />
+          )
+        })}
         {/* Dynamic comets with aligned tails - infrequent, slow, soft colors */}
         {comets.map(comet => (
           <motion.div
