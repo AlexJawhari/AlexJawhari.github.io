@@ -301,13 +301,13 @@ const generateComet = (id) => {
   
   // Slow movement with variance - all relatively slow
   const duration = 14 + Math.random() * 8 // 14-22 seconds
-  
+
   // Moderate delay between comets
   const delay = 5 + Math.random() * 6 // 5-11 seconds delay
-  
+
   // Random color from palette
   const color = COMET_COLORS[Math.floor(Math.random() * COMET_COLORS.length)]
-  
+
   return {
     id,
     startX: startLeft,
@@ -317,7 +317,8 @@ const generateComet = (id) => {
     angle,
     duration,
     delay,
-    color
+    color,
+    tailLength: 25 + Math.random() * 50
   }
 }
 
@@ -363,7 +364,6 @@ const OrbitBackdrop = () => {
   })
   
   const starOpacity = useTransform(smoothScroll, [0, 0.5, 1], [0.5, 1, 0.7])
-  const orbitRotation = useTransform(smoothScroll, [0, 1], [0, 90])
   const auroraOffsetY = useTransform(smoothScroll, [0, 1], [0, -260])
   const auroraOpacity = useTransform(smoothScroll, [0, 0.3, 1], [0.9, 0.7, 0.4])
   
@@ -453,6 +453,7 @@ const OrbitBackdrop = () => {
             <div 
               className="comet-tail" 
               style={{
+                width: `${comet.tailLength}px`,
                 background: `linear-gradient(
                   to right,
                   rgba(${comet.color.rgb}, 0) 0%,
@@ -479,11 +480,11 @@ const OrbitBackdrop = () => {
           </motion.div>
         ))}
       </div>
-      <motion.div className="absolute inset-0" style={{ rotate: orbitRotation }}>
+      <div className="absolute inset-0">
         {[...Array(6)].map((_, idx) => (
           <span key={idx} className={`orbit orbit-${idx + 1}`} />
         ))}
-      </motion.div>
+      </div>
       <div className="absolute inset-0" style={{ zIndex: 10 }}>
         {planetTransforms.map(planet => (
           <motion.span
