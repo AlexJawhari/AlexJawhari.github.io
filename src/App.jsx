@@ -209,7 +209,7 @@ const SECTION_VARIANTS = {
 }
 
 // Pre-generate star positions so we can keep them stable and avoid stars overlapping planets
-const STAR_COUNT = 160
+const STAR_COUNT = 170
 const PLANET_ZONES = [
   { top: 10, left: 88, radius: 12 }, // planet-1
   { top: 88, left: 15, radius: 14 }, // planet-2
@@ -259,12 +259,72 @@ const PLANETS = [
   }
 ]
 
-// Comet color palette - soft colors
+// Constellation data - Capricorn (Dec 22 birthday) + other space constellations
+// Each constellation is defined as an array of points [x, y] in percentage coordinates
+const CONSTELLATIONS = [
+  {
+    name: 'Capricorn',
+    points: [
+      [20, 15], [25, 20], [30, 18], [35, 22], [40, 20], [45, 25], [50, 22], [55, 28], [60, 25], [65, 30]
+    ],
+    size: { width: '50%', height: '35%' },
+    position: { top: '10%', left: '15%' },
+    duration: 24
+  },
+  {
+    name: 'Orion',
+    points: [
+      [30, 20], [35, 15], [40, 20], [45, 25], [50, 20], [55, 15], [60, 20], [50, 30], [50, 40]
+    ],
+    size: { width: '40%', height: '30%' },
+    position: { top: '25%', left: '50%' },
+    duration: 30
+  },
+  {
+    name: 'Cassiopeia',
+    points: [
+      [20, 30], [30, 25], [40, 35], [50, 30], [60, 40], [70, 35], [80, 45]
+    ],
+    size: { width: '65%', height: '25%' },
+    position: { top: '5%', left: '10%' },
+    duration: 26
+  },
+  {
+    name: 'Ursa Major',
+    points: [
+      [25, 40], [30, 35], [35, 40], [40, 35], [45, 40], [50, 45], [55, 40], [60, 50]
+    ],
+    size: { width: '40%', height: '20%' },
+    position: { top: '15%', left: '20%' },
+    duration: 32
+  },
+  {
+    name: 'Lyra',
+    points: [
+      [40, 50], [45, 45], [50, 50], [55, 55], [50, 60], [45, 55]
+    ],
+    size: { width: '20%', height: '15%' },
+    position: { top: '30%', left: '30%' },
+    duration: 36
+  },
+  {
+    name: 'Cygnus',
+    points: [
+      [50, 60], [55, 55], [60, 60], [65, 65], [70, 60], [75, 65], [80, 60]
+    ],
+    size: { width: '35%', height: '15%' },
+    position: { top: '20%', left: '45%' },
+    duration: 40
+  }
+]
+
+// Comet color palette - using the site's color palette
 const COMET_COLORS = [
-  { head: 'rgba(191, 160, 90, 0.6)', tail: 'rgba(191, 160, 90, 0.3)' }, // Soft gold
-  { head: 'rgba(197, 206, 209, 0.5)', tail: 'rgba(197, 206, 209, 0.25)' }, // Soft silver
-  { head: 'rgba(100, 150, 255, 0.5)', tail: 'rgba(100, 150, 255, 0.25)' }, // Soft blue
-  { head: 'rgba(56, 235, 187, 0.5)', tail: 'rgba(56, 235, 187, 0.25)' } // Soft green
+  { head: 'rgba(191, 160, 90, 0.7)', tail: 'rgba(191, 160, 90, 0.35)' }, // Gold
+  { head: 'rgba(197, 206, 209, 0.65)', tail: 'rgba(197, 206, 209, 0.3)' }, // Silver
+  { head: 'rgba(14, 32, 71, 0.7)', tail: 'rgba(14, 32, 71, 0.35)' }, // Deep blue
+  { head: 'rgba(12, 42, 33, 0.7)', tail: 'rgba(12, 42, 33, 0.35)' }, // Deep green
+  { head: 'rgba(43, 24, 15, 0.7)', tail: 'rgba(43, 24, 15, 0.35)' } // Deep brown
 ]
 
 // Comet generator - creates infrequent, slow, soft comets
@@ -284,8 +344,10 @@ const generateComet = (id) => {
   const dy = endTop - startTop
   const angle = Math.atan2(dy, dx) * (180 / Math.PI)
   
-  // Slow, soft movement - longer duration
-  const duration = 6 + Math.random() * 8 // 6-14 seconds (slightly faster for more frequent appearance)
+  // Slow movement with variance - all relatively slow
+  const baseDuration = 8 // Base slow duration
+  const variance = 4 + Math.random() * 6 // 4-10 seconds variance
+  const duration = baseDuration + variance // 12-18 seconds total (all relatively slow)
   
   // Shorter delay between comets (more frequent)
   const delay = Math.random() * 8 + 3 // 3-11 seconds delay
@@ -432,10 +494,11 @@ const OrbitBackdrop = () => {
                 background: `linear-gradient(
                   to right,
                   ${comet.color.tail}00 0%,
-                  ${comet.color.tail}60 15%,
-                  ${comet.color.tail}80 40%,
-                  ${comet.color.head}95 70%,
-                  ${comet.color.head}100 100%
+                  ${comet.color.tail}50 10%,
+                  ${comet.color.tail}70 30%,
+                  ${comet.color.head}90 60%,
+                  ${comet.color.head}100 85%,
+                  ${comet.color.head}80 100%
                 )`
               }}
             />
@@ -453,9 +516,46 @@ const OrbitBackdrop = () => {
           </motion.div>
         ))}
       </div>
+      {/* Constellations - currently using actual star patterns (Capricorn + others) */}
+      {/* To switch back to geometric orbit rings, replace CONSTELLATIONS with: 
+          {[...Array(6)].map((_, idx) => (
+            <span key={idx} className={`orbit orbit-${idx + 1}`} />
+          ))} */}
       <motion.div className="absolute inset-0" style={{ rotate: orbitRotation }}>
-        {[...Array(6)].map((_, idx) => (
-          <span key={idx} className={`orbit orbit-${idx + 1}`} />
+        {CONSTELLATIONS.map((constellation, idx) => (
+          <svg
+            key={constellation.name}
+            className="constellation"
+            style={{
+              position: 'absolute',
+              top: constellation.position.top,
+              left: constellation.position.left,
+              width: constellation.size.width,
+              height: constellation.size.height,
+              opacity: 0.12,
+              pointerEvents: 'none'
+            }}
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+          >
+            <polyline
+              points={constellation.points.map(([x, y]) => `${x},${y}`).join(' ')}
+              fill="none"
+              stroke="rgba(191, 160, 90, 0.15)"
+              strokeWidth="0.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            {constellation.points.map(([x, y], pointIdx) => (
+              <circle
+                key={pointIdx}
+                cx={x}
+                cy={y}
+                r="1.2"
+                fill="rgba(191, 160, 90, 0.4)"
+              />
+            ))}
+          </svg>
         ))}
       </motion.div>
       <div className="absolute inset-0" style={{ zIndex: 10 }}>
@@ -484,7 +584,7 @@ const OrbitBackdrop = () => {
 function Landing() {
   const heroProjects = PROJECTS.slice(0, 2)
   return (
-    <motion.div variants={SECTION_VARIANTS} initial="hidden" animate="visible" className="space-y-14 lg:space-y-20">
+    <motion.div variants={SECTION_VARIANTS} initial="hidden" animate="visible" className="space-y-20 lg:space-y-28">
       <section className="grid lg:grid-cols-[2fr,1fr] gap-8 items-stretch relative">
         <GlassCard className="p-8 lg:p-12 bg-gradient-to-br from-white/5 to-transparent backdrop-blur-2xl">
           <div className="flex flex-col gap-5">

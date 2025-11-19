@@ -54,6 +54,14 @@
   mix-blend-mode: screen;
 }
 
+/* Constellation styling - currently using actual constellations (Capricorn + others) */
+/* To switch back to geometric orbit rings, replace the CONSTELLATIONS array in App.jsx 
+   with the old orbit ring implementation */
+.constellation {
+  filter: drop-shadow(0 0 2px rgba(191, 160, 90, 0.2));
+}
+
+/* Old orbit rings - kept for reference if switching back */
 .orbit {
   position: absolute;
   border: 1px solid rgba(191, 160, 90, 0.08);
@@ -133,12 +141,12 @@
 
 .comet-tail {
   position: absolute;
-  width: 150px;
-  height: 2px;
+  width: 220px;
+  height: 2.5px;
   left: 50%;
   top: 50%;
   transform: translate(-100%, -50%);
-  filter: blur(1px);
+  filter: blur(1.2px);
   z-index: 1;
 }
 
@@ -161,11 +169,11 @@
   border-radius: 999px;
   width: 120px;
   height: 120px;
-  background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.85), rgba(120, 150, 180, 0.8) 45%, rgba(9, 12, 17, 0.95) 80%);
+  background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.85), rgba(120, 150, 180, 0.8) 45%, rgba(9, 12, 17, 1) 80%);
   box-shadow:
     0 0 35px rgba(100, 140, 200, 0.35),
     0 0 120px rgba(8, 10, 16, 0.9);
-  opacity: 0.75;
+  opacity: 0.85;
   pointer-events: none;
   filter: drop-shadow(0 0 25px rgba(20, 40, 70, 0.4));
   will-change: transform;
@@ -173,6 +181,8 @@
   transform: translateZ(0);
   backface-visibility: hidden;
   z-index: 10;
+  /* Ensure planets block stars */
+  background-clip: padding-box;
 }
 
 .planet::after {
@@ -187,28 +197,31 @@
 .planet--azure {
   width: 140px;
   height: 140px;
-  background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.8), rgba(115, 165, 255, 0.7) 40%, rgba(10, 16, 28, 0.95) 85%);
+  background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.8), rgba(115, 165, 255, 0.7) 40%, rgba(10, 16, 28, 1) 85%);
   box-shadow:
     0 0 45px rgba(90, 140, 255, 0.45),
     0 0 160px rgba(6, 8, 20, 0.85);
+  opacity: 0.85;
 }
 
 .planet--obsidian {
   width: 110px;
   height: 110px;
-  background: radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.75), rgba(70, 255, 205, 0.4) 35%, rgba(7, 20, 14, 0.95) 80%);
+  background: radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.75), rgba(70, 255, 205, 0.4) 35%, rgba(7, 20, 14, 1) 80%);
   box-shadow:
     0 0 45px rgba(40, 120, 90, 0.35),
     0 0 140px rgba(4, 10, 8, 0.9);
+  opacity: 0.85;
 }
 
 .planet--ember {
   width: 100px;
   height: 100px;
-  background: radial-gradient(circle at 25% 30%, rgba(255, 248, 200, 0.85), rgba(255, 150, 90, 0.6) 40%, rgba(25, 10, 5, 0.95) 80%);
+  background: radial-gradient(circle at 25% 30%, rgba(255, 248, 200, 0.85), rgba(255, 150, 90, 0.6) 40%, rgba(25, 10, 5, 1) 80%);
   box-shadow:
     0 0 30px rgba(255, 140, 70, 0.35),
     0 0 120px rgba(30, 8, 2, 0.8);
+  opacity: 0.85;
 }
 
 /* Removed planet ring - keeping planets clean and 3D */
@@ -227,10 +240,14 @@
 .glass-panel {
   background: linear-gradient(160deg, rgba(7, 9, 14, 0.58), rgba(8, 10, 15, 0.46) 40%, rgba(14, 10, 7, 0.42));
   backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
   box-shadow:
     0 40px 100px rgba(0, 0, 0, 0.55),
     inset 0 0 0 1px rgba(255, 255, 255, 0.04),
     0 0 35px rgba(18, 30, 61, 0.35);
+  isolation: isolate;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .pill-cta {
