@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect, useRef } from 'react'
 import { Routes, Route, NavLink, Link, useParams, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion'
 
 /* -------------------------------------------------------------------------- */
 /*                             Core portfolio data                            */
@@ -238,34 +238,64 @@ const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
 const PLANETS = [
   {
     id: 'azure',
-    className: 'planet planet--azure planet--rings',
+    className: 'planet planet--azure',
     base: { top: '6%', left: '74%' },
     xRange: [0, -260],
-    yRange: [0, 260]
+    yRange: [0, 260],
+    rotationRange: [0, 360] // 3D rotation
   },
   {
     id: 'obsidian',
     className: 'planet planet--obsidian',
     base: { top: '80%', left: '8%' },
     xRange: [0, 220],
-    yRange: [0, -310]
+    yRange: [0, -310],
+    rotationRange: [0, -360]
   },
   {
     id: 'ember',
     className: 'planet planet--ember planet--halo',
     base: { top: '70%', left: '82%' },
     xRange: [0, -80],
-    yRange: [0, 220]
+    yRange: [0, 220],
+    rotationRange: [0, 180]
   }
 ]
 
-const SHOOTING_STAR_PATHS = [
-  { id: 'east-long', top: 14, left: -20, path: 'path-right', delay: 0 },
-  { id: 'zenith', top: 32, left: 45, path: 'path-right-short', delay: 4.5 },
-  { id: 'west-return', top: 58, left: 110, path: 'path-left', delay: 9 },
-  { id: 'north-arc', top: 22, left: 85, path: 'path-left-short', delay: 13.5 },
-  { id: 'southern-drift', top: 78, left: 5, path: 'path-right-diagonal', delay: 18 }
-]
+// Comet generator - creates random comets
+const generateComet = (id) => {
+  // Random start position (off-screen)
+  const startSide = Math.random() < 0.5 ? 'left' : 'right'
+  const startTop = Math.random() * 100 // 0-100%
+  const startLeft = startSide === 'left' ? -10 : 110 // Off-screen
+  
+  // Random end position (off-screen or fade out)
+  const endSide = Math.random() < 0.5 ? 'left' : 'right'
+  const endTop = Math.random() * 100
+  const endLeft = endSide === 'left' ? -10 : 110
+  
+  // Calculate angle for tail alignment
+  const dx = endLeft - startLeft
+  const dy = endTop - startTop
+  const angle = Math.atan2(dy, dx) * (180 / Math.PI)
+  
+  // Random duration
+  const duration = 3 + Math.random() * 4 // 3-7 seconds
+  
+  // Random delay
+  const delay = Math.random() * 10
+  
+  return {
+    id,
+    startX: startLeft,
+    startY: startTop,
+    endX: endLeft,
+    endY: endTop,
+    angle,
+    duration,
+    delay
+  }
+}
 
 /* -------------------------------------------------------------------------- */
 /*                                UI components                               */
@@ -300,15 +330,47 @@ const GlassCard = ({ children, className = '' }) => (
 
 const OrbitBackdrop = () => {
   const { scrollYProgress } = useScroll()
-  const starOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.5, 1, 0.7])
-  const orbitRotation = useTransform(scrollYProgress, [0, 1], [0, 90])
-  const auroraOffsetY = useTransform(scrollYProgress, [0, 1], [0, -260])
-  const auroraOpacity = useTransform(scrollYProgress, [0, 0.3, 1], [0.9, 0.7, 0.4])
+  
+  // Use useSpring for smooth, lag-free planet movement
+  const smoothScroll = useSpring(scrollYProgress, { 
+    stiffness: 100, 
+    damping: 30,
+    mass: 0.5
+  })
+  
+  const starOpacity = useTransform(smoothScroll, [0, 0.5, 1], [0.5, 1, 0.7])
+  const orbitRotation = useTransform(smoothScroll, [0, 1], [0, 90])
+  const auroraOffsetY = useTransform(smoothScroll, [0, 1], [0, -260])
+  const auroraOpacity = useTransform(smoothScroll, [0, 0.3, 1], [0.9, 0.7, 0.4])
+  
+  // Smooth planet transforms with 3D rotation
   const planetTransforms = PLANETS.map(planet => ({
     ...planet,
-    x: useTransform(scrollYProgress, [0, 1], planet.xRange),
-    y: useTransform(scrollYProgress, [0, 1], planet.yRange)
+    x: useTransform(smoothScroll, [0, 1], planet.xRange),
+    y: useTransform(smoothScroll, [0, 1], planet.yRange),
+    rotateY: useTransform(smoothScroll, [0, 1], planet.rotationRange),
+    rotateX: useTransform(smoothScroll, [0, 1], [0, planet.rotationRange[1] * 0.5])
   }))
+  
+  // Generate comets dynamically
+  const [comets, setComets] = useState(() => 
+    Array.from({ length: 8 }, (_, i) => generateComet(i))
+  )
+  
+  // Regenerate comets periodically for variety
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setComets(prev => prev.map((comet, i) => {
+        // Only regenerate if comet animation is likely finished
+        if (Math.random() < 0.3) {
+          return generateComet(i)
+        }
+        return comet
+      }))
+    }, 15000) // Every 15 seconds
+    
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none">
@@ -328,16 +390,38 @@ const OrbitBackdrop = () => {
             }}
           />
         ))}
-        {SHOOTING_STAR_PATHS.map(star => (
-          <span
-            key={star.id}
-            className={`shooting-star ${star.path}`}
+        {/* Dynamic comets with aligned tails */}
+        {comets.map(comet => (
+          <motion.div
+            key={comet.id}
+            className="comet-container"
             style={{
-              top: `${star.top}%`,
-              left: `${star.left}%`,
-              animationDelay: `${star.delay}s`
+              left: `${comet.startX}%`,
+              top: `${comet.startY}%`,
+              rotate: `${comet.angle}deg`
             }}
-          />
+            initial={{ 
+              x: 0, 
+              y: 0, 
+              opacity: 0 
+            }}
+            animate={{
+              x: `${comet.endX - comet.startX}vw`,
+              y: `${comet.endY - comet.startY}vh`,
+              opacity: [0, 1, 1, 0]
+            }}
+            transition={{
+              duration: comet.duration,
+              delay: comet.delay,
+              repeat: Infinity,
+              repeatDelay: 5 + Math.random() * 10,
+              ease: 'linear',
+              times: [0, 0.1, 0.9, 1]
+            }}
+          >
+            <div className="comet-tail" />
+            <div className="comet-head" />
+          </motion.div>
         ))}
       </div>
       <motion.div className="absolute inset-0" style={{ rotate: orbitRotation }}>
@@ -350,7 +434,15 @@ const OrbitBackdrop = () => {
           <motion.span
             key={planet.id}
             className={planet.className}
-            style={{ top: planet.base.top, left: planet.base.left, x: planet.x, y: planet.y }}
+            style={{ 
+              top: planet.base.top, 
+              left: planet.base.left, 
+              x: planet.x, 
+              y: planet.y,
+              rotateY: planet.rotateY,
+              rotateX: planet.rotateX,
+              transformStyle: 'preserve-3d'
+            }}
           />
         ))}
       </div>
