@@ -209,7 +209,7 @@ const SECTION_VARIANTS = {
 }
 
 // Pre-generate star positions so we can keep them stable and avoid stars overlapping planets
-const STAR_COUNT = 120
+const STAR_COUNT = 160
 const PLANET_ZONES = [
   { top: 10, left: 88, radius: 12 }, // planet-1
   { top: 88, left: 15, radius: 14 }, // planet-2
@@ -285,10 +285,10 @@ const generateComet = (id) => {
   const angle = Math.atan2(dy, dx) * (180 / Math.PI)
   
   // Slow, soft movement - longer duration
-  const duration = 8 + Math.random() * 12 // 8-20 seconds (much slower)
+  const duration = 6 + Math.random() * 8 // 6-14 seconds (slightly faster for more frequent appearance)
   
-  // Longer delay between comets (infrequent)
-  const delay = Math.random() * 30 + 10 // 10-40 seconds delay
+  // Shorter delay between comets (more frequent)
+  const delay = Math.random() * 8 + 3 // 3-11 seconds delay
   
   // Random color from palette
   const color = COMET_COLORS[Math.floor(Math.random() * COMET_COLORS.length)]
@@ -359,22 +359,22 @@ const OrbitBackdrop = () => {
     y: useTransform(smoothScroll, [0, 1], planet.yRange)
   }))
   
-  // Generate fewer comets (infrequent)
+  // Generate more comets (more frequent)
   const [comets, setComets] = useState(() => 
-    Array.from({ length: 3 }, (_, i) => generateComet(i))
+    Array.from({ length: 5 }, (_, i) => generateComet(i))
   )
   
-  // Regenerate comets less frequently
+  // Regenerate comets more frequently
   useEffect(() => {
     const interval = setInterval(() => {
       setComets(prev => prev.map((comet, i) => {
-        // Only regenerate occasionally (infrequent)
-        if (Math.random() < 0.15) {
+        // Regenerate more often (more frequent)
+        if (Math.random() < 0.4) {
           return generateComet(i)
         }
         return comet
       }))
-    }, 30000) // Every 30 seconds (less frequent)
+    }, 15000) // Every 15 seconds (more frequent)
     
     return () => clearInterval(interval)
   }, [])
@@ -383,7 +383,7 @@ const OrbitBackdrop = () => {
     <div className="fixed inset-0 -z-10 pointer-events-none">
       <div className="absolute inset-0 bg-[#040507]" />
       <motion.div className="absolute inset-0 bg-radial" style={{ opacity: 1 }} />
-      <motion.div className="absolute inset-0 bg-grid" style={{ opacity: starOpacity }} />
+      {/* Grid temporarily removed */}
       <div className="absolute inset-0 bg-noise opacity-40" />
       <div className="absolute inset-0 starfield">
         {STARS.filter(star => !star.hidden).map(star => (
@@ -421,7 +421,7 @@ const OrbitBackdrop = () => {
               duration: comet.duration,
               delay: comet.delay,
               repeat: Infinity,
-              repeatDelay: 15 + Math.random() * 25, // Longer delays between repeats
+              repeatDelay: 5 + Math.random() * 10, // Shorter delays between repeats
               ease: 'easeInOut', // Softer easing
               times: [0, 0.15, 0.85, 1]
             }}
@@ -432,10 +432,10 @@ const OrbitBackdrop = () => {
                 background: `linear-gradient(
                   to right,
                   ${comet.color.tail}00 0%,
-                  ${comet.color.tail}40 20%,
-                  ${comet.color.tail}60 50%,
-                  ${comet.color.head}80 80%,
-                  ${comet.color.head}90 100%
+                  ${comet.color.tail}60 15%,
+                  ${comet.color.tail}80 40%,
+                  ${comet.color.head}95 70%,
+                  ${comet.color.head}100 100%
                 )`
               }}
             />
@@ -458,7 +458,7 @@ const OrbitBackdrop = () => {
           <span key={idx} className={`orbit orbit-${idx + 1}`} />
         ))}
       </motion.div>
-      <div className="absolute inset-0">
+      <div className="absolute inset-0" style={{ zIndex: 10 }}>
         {planetTransforms.map(planet => (
           <motion.span
             key={planet.id}
@@ -467,7 +467,8 @@ const OrbitBackdrop = () => {
               top: planet.base.top, 
               left: planet.base.left, 
               x: planet.x, 
-              y: planet.y
+              y: planet.y,
+              zIndex: 10
             }}
           />
         ))}
