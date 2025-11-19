@@ -217,8 +217,17 @@ const PLANET_ZONES = [
 ]
 
 const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
-  const top = Math.random() * 100
-  const left = Math.random() * 100
+  // Add more stars in top right corner (75-100% top, 70-100% left)
+  let top, left
+  if (idx < 20) {
+    // First 20 stars: favor top right corner
+    top = 75 + Math.random() * 25 // 75-100%
+    left = 70 + Math.random() * 30 // 70-100%
+  } else {
+    // Rest: random distribution
+    top = Math.random() * 100
+    left = Math.random() * 100
+  }
 
   const overlapsPlanet = PLANET_ZONES.some(zone => {
     const dx = left - zone.left
@@ -260,60 +269,60 @@ const PLANETS = [
 ]
 
 // Constellation data - Capricorn (Dec 22 birthday) + other space constellations
-// Each constellation is defined as an array of points [x, y] in percentage coordinates
+// Sized and positioned like orbit rings, with constellation patterns inside
 const CONSTELLATIONS = [
   {
     name: 'Capricorn',
     points: [
-      [20, 15], [25, 20], [30, 18], [35, 22], [40, 20], [45, 25], [50, 22], [55, 28], [60, 25], [65, 30]
+      [30, 20], [35, 25], [40, 23], [45, 27], [50, 25], [55, 30], [60, 27], [65, 33], [70, 30]
     ],
-    size: { width: '50%', height: '35%' },
-    position: { top: '10%', left: '15%' },
+    size: { width: '60%', height: '40%' },
+    position: { top: '10%', left: '20%' },
     duration: 24
   },
   {
     name: 'Orion',
     points: [
-      [30, 20], [35, 15], [40, 20], [45, 25], [50, 20], [55, 15], [60, 20], [50, 30], [50, 40]
+      [40, 25], [45, 20], [50, 25], [55, 30], [60, 25], [65, 20], [70, 25], [60, 35], [60, 45]
     ],
-    size: { width: '40%', height: '30%' },
-    position: { top: '25%', left: '50%' },
+    size: { width: '45%', height: '60%' },
+    position: { top: '20%', left: '40%' },
     duration: 30
   },
   {
     name: 'Cassiopeia',
     points: [
-      [20, 30], [30, 25], [40, 35], [50, 30], [60, 40], [70, 35], [80, 45]
+      [25, 35], [35, 30], [45, 40], [55, 35], [65, 45], [75, 40], [85, 50]
     ],
-    size: { width: '65%', height: '25%' },
-    position: { top: '5%', left: '10%' },
+    size: { width: '80%', height: '70%' },
+    position: { top: '12%', left: '5%' },
     duration: 26
   },
   {
     name: 'Ursa Major',
     points: [
-      [25, 40], [30, 35], [35, 40], [40, 35], [45, 40], [50, 45], [55, 40], [60, 50]
+      [30, 45], [35, 40], [40, 45], [45, 40], [50, 45], [55, 50], [60, 45], [65, 55]
     ],
-    size: { width: '40%', height: '20%' },
-    position: { top: '15%', left: '20%' },
+    size: { width: '55%', height: '40%' },
+    position: { top: '30%', left: '30%' },
     duration: 32
   },
   {
     name: 'Lyra',
     points: [
-      [40, 50], [45, 45], [50, 50], [55, 55], [50, 60], [45, 55]
+      [45, 55], [50, 50], [55, 55], [60, 60], [55, 65], [50, 60]
     ],
-    size: { width: '20%', height: '15%' },
-    position: { top: '30%', left: '30%' },
+    size: { width: '65%', height: '50%' },
+    position: { top: '15%', left: '15%' },
     duration: 36
   },
   {
     name: 'Cygnus',
     points: [
-      [50, 60], [55, 55], [60, 60], [65, 65], [70, 60], [75, 65], [80, 60]
+      [55, 65], [60, 60], [65, 65], [70, 70], [75, 65], [80, 70], [85, 65]
     ],
-    size: { width: '35%', height: '15%' },
-    position: { top: '20%', left: '45%' },
+    size: { width: '70%', height: '60%' },
+    position: { top: '5%', left: '20%' },
     duration: 40
   }
 ]
@@ -494,11 +503,13 @@ const OrbitBackdrop = () => {
                 background: `linear-gradient(
                   to right,
                   ${comet.color.tail}00 0%,
-                  ${comet.color.tail}50 10%,
-                  ${comet.color.tail}70 30%,
-                  ${comet.color.head}90 60%,
-                  ${comet.color.head}100 85%,
-                  ${comet.color.head}80 100%
+                  ${comet.color.tail}30 5%,
+                  ${comet.color.tail}60 20%,
+                  ${comet.color.tail}80 40%,
+                  ${comet.color.head}95 65%,
+                  ${comet.color.head}100 80%,
+                  ${comet.color.head}90 90%,
+                  ${comet.color.head}70 100%
                 )`
               }}
             />
@@ -516,46 +527,54 @@ const OrbitBackdrop = () => {
           </motion.div>
         ))}
       </div>
-      {/* Constellations - currently using actual star patterns (Capricorn + others) */}
+      {/* Constellations - sized and positioned like orbit rings, with proper aspect ratio */}
       {/* To switch back to geometric orbit rings, replace CONSTELLATIONS with: 
           {[...Array(6)].map((_, idx) => (
             <span key={idx} className={`orbit orbit-${idx + 1}`} />
           ))} */}
       <motion.div className="absolute inset-0" style={{ rotate: orbitRotation }}>
         {CONSTELLATIONS.map((constellation, idx) => (
-          <svg
+          <div
             key={constellation.name}
-            className="constellation"
+            className="constellation-container"
             style={{
               position: 'absolute',
               top: constellation.position.top,
               left: constellation.position.left,
               width: constellation.size.width,
               height: constellation.size.height,
-              opacity: 0.12,
               pointerEvents: 'none'
             }}
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
           >
-            <polyline
-              points={constellation.points.map(([x, y]) => `${x},${y}`).join(' ')}
-              fill="none"
-              stroke="rgba(191, 160, 90, 0.15)"
-              strokeWidth="0.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            {constellation.points.map(([x, y], pointIdx) => (
-              <circle
-                key={pointIdx}
-                cx={x}
-                cy={y}
-                r="1.2"
-                fill="rgba(191, 160, 90, 0.4)"
+            <svg
+              className="constellation"
+              style={{
+                width: '100%',
+                height: '100%',
+                opacity: 0.12
+              }}
+              viewBox="0 0 100 100"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <polyline
+                points={constellation.points.map(([x, y]) => `${x},${y}`).join(' ')}
+                fill="none"
+                stroke="rgba(191, 160, 90, 0.15)"
+                strokeWidth="0.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
-            ))}
-          </svg>
+              {constellation.points.map(([x, y], pointIdx) => (
+                <circle
+                  key={pointIdx}
+                  cx={x}
+                  cy={y}
+                  r="1.2"
+                  fill="rgba(191, 160, 90, 0.4)"
+                />
+              ))}
+            </svg>
+          </div>
         ))}
       </motion.div>
       <div className="absolute inset-0" style={{ zIndex: 10 }}>
@@ -584,7 +603,7 @@ const OrbitBackdrop = () => {
 function Landing() {
   const heroProjects = PROJECTS.slice(0, 2)
   return (
-    <motion.div variants={SECTION_VARIANTS} initial="hidden" animate="visible" className="space-y-20 lg:space-y-28">
+    <motion.div variants={SECTION_VARIANTS} initial="hidden" animate="visible" className="space-y-24 lg:space-y-32">
       <section className="grid lg:grid-cols-[2fr,1fr] gap-8 items-stretch relative">
         <GlassCard className="p-8 lg:p-12 bg-gradient-to-br from-white/5 to-transparent backdrop-blur-2xl">
           <div className="flex flex-col gap-5">

@@ -57,6 +57,10 @@
 /* Constellation styling - currently using actual constellations (Capricorn + others) */
 /* To switch back to geometric orbit rings, replace the CONSTELLATIONS array in App.jsx 
    with the old orbit ring implementation */
+.constellation-container {
+  transform-origin: center center;
+}
+
 .constellation {
   filter: drop-shadow(0 0 2px rgba(191, 160, 90, 0.2));
 }
@@ -141,12 +145,12 @@
 
 .comet-tail {
   position: absolute;
-  width: 220px;
-  height: 2.5px;
+  width: 320px;
+  height: 3px;
   left: 50%;
   top: 50%;
   transform: translate(-100%, -50%);
-  filter: blur(1.2px);
+  filter: blur(1.5px);
   z-index: 1;
 }
 
