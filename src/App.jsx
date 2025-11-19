@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { Routes, Route, NavLink, Link, useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion'
 
@@ -209,7 +209,7 @@ const SECTION_VARIANTS = {
 }
 
 // Pre-generate star positions so we can keep them stable and avoid stars overlapping planets
-const STAR_COUNT = 220
+const STAR_COUNT = 170
 const PLANET_ZONES = [
   { top: 10, left: 88, radius: 12 }, // planet-1
   { top: 88, left: 15, radius: 14 }, // planet-2
@@ -235,18 +235,12 @@ const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
     return Math.sqrt(dx * dx + dy * dy) < zone.radius
   })
 
-  // Some stars get colors (about 30% of stars)
-  const hasColor = idx % 3 === 0 && !overlapsPlanet
-  const color = hasColor ? STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)] : null
-
   return {
     id: idx,
     top,
     left,
     delay: idx * 0.18,
-    hidden: overlapsPlanet,
-    hasColor,
-    color
+    hidden: overlapsPlanet
   }
 })
 
@@ -335,21 +329,11 @@ const CONSTELLATIONS = [
 
 // Comet color palette - using the site's color palette
 const COMET_COLORS = [
-  { head: 'rgba(191, 160, 90, 0.9)', tail: 'rgba(191, 160, 90, 0.5)', rgb: '191, 160, 90' }, // Gold
-  { head: 'rgba(197, 206, 209, 0.85)', tail: 'rgba(197, 206, 209, 0.45)', rgb: '197, 206, 209' }, // Silver
-  { head: 'rgba(14, 32, 71, 0.9)', tail: 'rgba(14, 32, 71, 0.5)', rgb: '14, 32, 71' }, // Deep blue
-  { head: 'rgba(12, 42, 33, 0.9)', tail: 'rgba(12, 42, 33, 0.5)', rgb: '12, 42, 33' }, // Deep green
-  { head: 'rgba(43, 24, 15, 0.9)', tail: 'rgba(43, 24, 15, 0.5)', rgb: '43, 24, 15' } // Deep brown
-]
-
-// Star color palette for colored twinkling stars
-const STAR_COLORS = [
-  'rgba(191, 160, 90, 1)', // Gold
-  'rgba(197, 206, 209, 1)', // Silver
-  'rgba(14, 32, 71, 1)', // Deep blue
-  'rgba(12, 42, 33, 1)', // Deep green
-  'rgba(43, 24, 15, 1)', // Deep brown
-  'rgba(255, 255, 255, 1)' // White (original)
+  { head: 'rgba(191, 160, 90, 0.7)', tail: 'rgba(191, 160, 90, 0.35)' }, // Gold
+  { head: 'rgba(197, 206, 209, 0.65)', tail: 'rgba(197, 206, 209, 0.3)' }, // Silver
+  { head: 'rgba(14, 32, 71, 0.7)', tail: 'rgba(14, 32, 71, 0.35)' }, // Deep blue
+  { head: 'rgba(12, 42, 33, 0.7)', tail: 'rgba(12, 42, 33, 0.35)' }, // Deep green
+  { head: 'rgba(43, 24, 15, 0.7)', tail: 'rgba(43, 24, 15, 0.35)' } // Deep brown
 ]
 
 // Comet generator - creates infrequent, slow, soft comets
@@ -473,23 +457,17 @@ const OrbitBackdrop = () => {
       {/* Grid temporarily removed */}
       <div className="absolute inset-0 bg-noise opacity-40" />
       <div className="absolute inset-0 starfield">
-        {STARS.filter(star => !star.hidden).map(star => {
-          const style = {
-            top: `${star.top}%`,
-            left: `${star.left}%`,
-            animationDelay: `${star.delay}s`
-          }
-          if (star.hasColor && star.color) {
-            style['--star-color'] = star.color
-          }
-          return (
-            <span
-              key={star.id}
-              className={star.hasColor ? 'star star-colored' : 'star'}
-              style={style}
-            />
-          )
-        })}
+        {STARS.filter(star => !star.hidden).map(star => (
+          <span
+            key={star.id}
+            className="star"
+            style={{
+              top: `${star.top}%`,
+              left: `${star.left}%`,
+              animationDelay: `${star.delay}s`
+            }}
+          />
+        ))}
         {/* Dynamic comets with aligned tails - infrequent, slow, soft colors */}
         {comets.map(comet => (
           <motion.div
@@ -524,15 +502,14 @@ const OrbitBackdrop = () => {
               style={{
                 background: `linear-gradient(
                   to right,
-                  rgba(${comet.color.rgb}, 0) 0%,
-                  rgba(${comet.color.rgb}, 0.2) 8%,
-                  rgba(${comet.color.rgb}, 0.4) 20%,
-                  rgba(${comet.color.rgb}, 0.6) 35%,
-                  rgba(${comet.color.rgb}, 0.7) 50%,
-                  rgba(${comet.color.rgb}, 0.8) 70%,
-                  rgba(${comet.color.rgb}, 0.9) 85%,
-                  rgba(${comet.color.rgb}, 0.95) 95%,
-                  rgba(${comet.color.rgb}, 1) 100%
+                  ${comet.color.tail}00 0%,
+                  ${comet.color.tail}30 5%,
+                  ${comet.color.tail}60 20%,
+                  ${comet.color.tail}80 40%,
+                  ${comet.color.head}95 65%,
+                  ${comet.color.head}100 80%,
+                  ${comet.color.head}90 90%,
+                  ${comet.color.head}70 100%
                 )`
               }}
             />
@@ -574,37 +551,26 @@ const OrbitBackdrop = () => {
               style={{
                 width: '100%',
                 height: '100%',
-                opacity: 0.25
+                opacity: 0.12
               }}
               viewBox="0 0 100 100"
               preserveAspectRatio="xMidYMid meet"
             >
-              <defs>
-                <filter id={`glow-${idx}`}>
-                  <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
-                  <feMerge>
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-              </defs>
               <polyline
                 points={constellation.points.map(([x, y]) => `${x},${y}`).join(' ')}
                 fill="none"
-                stroke="rgba(191, 160, 90, 0.4)"
-                strokeWidth="1.2"
+                stroke="rgba(191, 160, 90, 0.15)"
+                strokeWidth="0.8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                filter={`url(#glow-${idx})`}
               />
               {constellation.points.map(([x, y], pointIdx) => (
                 <circle
                   key={pointIdx}
                   cx={x}
                   cy={y}
-                  r="1.8"
-                  fill="rgba(191, 160, 90, 0.7)"
-                  filter={`url(#glow-${idx})`}
+                  r="1.2"
+                  fill="rgba(191, 160, 90, 0.4)"
                 />
               ))}
             </svg>

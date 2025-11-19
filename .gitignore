@@ -10,4 +10,9 @@ coverage/
 .env.*
 .vite
 
+# Documentation and temporary files
+HANDOFF_PROMPT.md
+temp_working.jsx
+*.jsx.bak
+
 
