@@ -241,28 +241,33 @@ const PLANETS = [
     className: 'planet planet--azure',
     base: { top: '6%', left: '74%' },
     xRange: [0, -260],
-    yRange: [0, 260],
-    rotationRange: [0, 360] // 3D rotation
+    yRange: [0, 260]
   },
   {
     id: 'obsidian',
     className: 'planet planet--obsidian',
     base: { top: '80%', left: '8%' },
     xRange: [0, 220],
-    yRange: [0, -310],
-    rotationRange: [0, -360]
+    yRange: [0, -310]
   },
   {
     id: 'ember',
     className: 'planet planet--ember planet--halo',
     base: { top: '70%', left: '82%' },
     xRange: [0, -80],
-    yRange: [0, 220],
-    rotationRange: [0, 180]
+    yRange: [0, 220]
   }
 ]
 
-// Comet generator - creates random comets
+// Comet color palette - soft colors
+const COMET_COLORS = [
+  { head: 'rgba(191, 160, 90, 0.6)', tail: 'rgba(191, 160, 90, 0.3)' }, // Soft gold
+  { head: 'rgba(197, 206, 209, 0.5)', tail: 'rgba(197, 206, 209, 0.25)' }, // Soft silver
+  { head: 'rgba(100, 150, 255, 0.5)', tail: 'rgba(100, 150, 255, 0.25)' }, // Soft blue
+  { head: 'rgba(56, 235, 187, 0.5)', tail: 'rgba(56, 235, 187, 0.25)' } // Soft green
+]
+
+// Comet generator - creates infrequent, slow, soft comets
 const generateComet = (id) => {
   // Random start position (off-screen)
   const startSide = Math.random() < 0.5 ? 'left' : 'right'
@@ -279,11 +284,14 @@ const generateComet = (id) => {
   const dy = endTop - startTop
   const angle = Math.atan2(dy, dx) * (180 / Math.PI)
   
-  // Random duration
-  const duration = 3 + Math.random() * 4 // 3-7 seconds
+  // Slow, soft movement - longer duration
+  const duration = 8 + Math.random() * 12 // 8-20 seconds (much slower)
   
-  // Random delay
-  const delay = Math.random() * 10
+  // Longer delay between comets (infrequent)
+  const delay = Math.random() * 30 + 10 // 10-40 seconds delay
+  
+  // Random color from palette
+  const color = COMET_COLORS[Math.floor(Math.random() * COMET_COLORS.length)]
   
   return {
     id,
@@ -293,7 +301,8 @@ const generateComet = (id) => {
     endY: endTop,
     angle,
     duration,
-    delay
+    delay,
+    color
   }
 }
 
@@ -331,11 +340,11 @@ const GlassCard = ({ children, className = '' }) => (
 const OrbitBackdrop = () => {
   const { scrollYProgress } = useScroll()
   
-  // Use useSpring for smooth, lag-free planet movement
+  // Use useSpring for smooth, lag-free planet movement with optimized settings
   const smoothScroll = useSpring(scrollYProgress, { 
-    stiffness: 100, 
-    damping: 30,
-    mass: 0.5
+    stiffness: 150, 
+    damping: 40,
+    mass: 0.3
   })
   
   const starOpacity = useTransform(smoothScroll, [0, 0.5, 1], [0.5, 1, 0.7])
@@ -343,31 +352,29 @@ const OrbitBackdrop = () => {
   const auroraOffsetY = useTransform(smoothScroll, [0, 1], [0, -260])
   const auroraOpacity = useTransform(smoothScroll, [0, 0.3, 1], [0.9, 0.7, 0.4])
   
-  // Smooth planet transforms with 3D rotation
+  // Smooth planet transforms - position only, no rotation
   const planetTransforms = PLANETS.map(planet => ({
     ...planet,
     x: useTransform(smoothScroll, [0, 1], planet.xRange),
-    y: useTransform(smoothScroll, [0, 1], planet.yRange),
-    rotateY: useTransform(smoothScroll, [0, 1], planet.rotationRange),
-    rotateX: useTransform(smoothScroll, [0, 1], [0, planet.rotationRange[1] * 0.5])
+    y: useTransform(smoothScroll, [0, 1], planet.yRange)
   }))
   
-  // Generate comets dynamically
+  // Generate fewer comets (infrequent)
   const [comets, setComets] = useState(() => 
-    Array.from({ length: 8 }, (_, i) => generateComet(i))
+    Array.from({ length: 3 }, (_, i) => generateComet(i))
   )
   
-  // Regenerate comets periodically for variety
+  // Regenerate comets less frequently
   useEffect(() => {
     const interval = setInterval(() => {
       setComets(prev => prev.map((comet, i) => {
-        // Only regenerate if comet animation is likely finished
-        if (Math.random() < 0.3) {
+        // Only regenerate occasionally (infrequent)
+        if (Math.random() < 0.15) {
           return generateComet(i)
         }
         return comet
       }))
-    }, 15000) // Every 15 seconds
+    }, 30000) // Every 30 seconds (less frequent)
     
     return () => clearInterval(interval)
   }, [])
@@ -390,7 +397,7 @@ const OrbitBackdrop = () => {
             }}
           />
         ))}
-        {/* Dynamic comets with aligned tails */}
+        {/* Dynamic comets with aligned tails - infrequent, slow, soft colors */}
         {comets.map(comet => (
           <motion.div
             key={comet.id}
@@ -408,19 +415,41 @@ const OrbitBackdrop = () => {
             animate={{
               x: `${comet.endX - comet.startX}vw`,
               y: `${comet.endY - comet.startY}vh`,
-              opacity: [0, 1, 1, 0]
+              opacity: [0, 0.6, 0.6, 0] // Softer opacity
             }}
             transition={{
               duration: comet.duration,
               delay: comet.delay,
               repeat: Infinity,
-              repeatDelay: 5 + Math.random() * 10,
-              ease: 'linear',
-              times: [0, 0.1, 0.9, 1]
+              repeatDelay: 15 + Math.random() * 25, // Longer delays between repeats
+              ease: 'easeInOut', // Softer easing
+              times: [0, 0.15, 0.85, 1]
             }}
           >
-            <div className="comet-tail" />
-            <div className="comet-head" />
+            <div 
+              className="comet-tail" 
+              style={{
+                background: `linear-gradient(
+                  to right,
+                  ${comet.color.tail}00 0%,
+                  ${comet.color.tail}40 20%,
+                  ${comet.color.tail}60 50%,
+                  ${comet.color.head}80 80%,
+                  ${comet.color.head}90 100%
+                )`
+              }}
+            />
+            <div 
+              className="comet-head" 
+              style={{
+                background: comet.color.head,
+                boxShadow: `
+                  0 0 8px ${comet.color.head},
+                  0 0 15px ${comet.color.tail},
+                  0 0 25px ${comet.color.tail}40
+                `
+              }}
+            />
           </motion.div>
         ))}
       </div>
@@ -438,10 +467,7 @@ const OrbitBackdrop = () => {
               top: planet.base.top, 
               left: planet.base.left, 
               x: planet.x, 
-              y: planet.y,
-              rotateY: planet.rotateY,
-              rotateX: planet.rotateX,
-              transformStyle: 'preserve-3d'
+              y: planet.y
             }}
           />
         ))}
