@@ -209,7 +209,7 @@ const SECTION_VARIANTS = {
 }
 
 // Pre-generate star positions so we can keep them stable and avoid stars overlapping planets
-const STAR_COUNT = 170
+const STAR_COUNT = 220
 const PLANET_ZONES = [
   { top: 10, left: 88, radius: 12 }, // planet-1
   { top: 88, left: 15, radius: 14 }, // planet-2
@@ -235,12 +235,18 @@ const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
     return Math.sqrt(dx * dx + dy * dy) < zone.radius
   })
 
+  // Some stars get colors (about 30% of stars)
+  const hasColor = idx % 3 === 0 && !overlapsPlanet
+  const color = hasColor ? STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)] : null
+
   return {
     id: idx,
     top,
     left,
     delay: idx * 0.18,
-    hidden: overlapsPlanet
+    hidden: overlapsPlanet,
+    hasColor,
+    color
   }
 })
 
@@ -329,11 +335,21 @@ const CONSTELLATIONS = [
 
 // Comet color palette - using the site's color palette
 const COMET_COLORS = [
-  { head: 'rgba(191, 160, 90, 0.7)', tail: 'rgba(191, 160, 90, 0.35)' }, // Gold
-  { head: 'rgba(197, 206, 209, 0.65)', tail: 'rgba(197, 206, 209, 0.3)' }, // Silver
-  { head: 'rgba(14, 32, 71, 0.7)', tail: 'rgba(14, 32, 71, 0.35)' }, // Deep blue
-  { head: 'rgba(12, 42, 33, 0.7)', tail: 'rgba(12, 42, 33, 0.35)' }, // Deep green
-  { head: 'rgba(43, 24, 15, 0.7)', tail: 'rgba(43, 24, 15, 0.35)' } // Deep brown
+  { head: 'rgba(191, 160, 90, 0.9)', tail: 'rgba(191, 160, 90, 0.5)' }, // Gold
+  { head: 'rgba(197, 206, 209, 0.85)', tail: 'rgba(197, 206, 209, 0.45)' }, // Silver
+  { head: 'rgba(14, 32, 71, 0.9)', tail: 'rgba(14, 32, 71, 0.5)' }, // Deep blue
+  { head: 'rgba(12, 42, 33, 0.9)', tail: 'rgba(12, 42, 33, 0.5)' }, // Deep green
+  { head: 'rgba(43, 24, 15, 0.9)', tail: 'rgba(43, 24, 15, 0.5)' } // Deep brown
+]
+
+// Star color palette for colored twinkling stars
+const STAR_COLORS = [
+  'rgba(191, 160, 90, 1)', // Gold
+  'rgba(197, 206, 209, 1)', // Silver
+  'rgba(14, 32, 71, 1)', // Deep blue
+  'rgba(12, 42, 33, 1)', // Deep green
+  'rgba(43, 24, 15, 1)', // Deep brown
+  'rgba(255, 255, 255, 1)' // White (original)
 ]
 
 // Comet generator - creates infrequent, slow, soft comets
@@ -460,11 +476,12 @@ const OrbitBackdrop = () => {
         {STARS.filter(star => !star.hidden).map(star => (
           <span
             key={star.id}
-            className="star"
+            className={star.hasColor ? 'star star-colored' : 'star'}
             style={{
               top: `${star.top}%`,
               left: `${star.left}%`,
-              animationDelay: `${star.delay}s`
+              animationDelay: `${star.delay}s`,
+              ...(star.hasColor && star.color ? { '--star-color': star.color } : {})
             }}
           />
         ))}
@@ -502,14 +519,15 @@ const OrbitBackdrop = () => {
               style={{
                 background: `linear-gradient(
                   to right,
-                  ${comet.color.tail}00 0%,
-                  ${comet.color.tail}30 5%,
-                  ${comet.color.tail}60 20%,
-                  ${comet.color.tail}80 40%,
-                  ${comet.color.head}95 65%,
-                  ${comet.color.head}100 80%,
-                  ${comet.color.head}90 90%,
-                  ${comet.color.head}70 100%
+                  transparent 0%,
+                  ${comet.color.tail.replace('0.5', '0.2')} 8%,
+                  ${comet.color.tail.replace('0.5', '0.4')} 20%,
+                  ${comet.color.tail.replace('0.5', '0.6')} 35%,
+                  ${comet.color.tail.replace('0.5', '0.7')} 50%,
+                  ${comet.color.head.replace('0.9', '0.8')} 70%,
+                  ${comet.color.head.replace('0.9', '0.9')} 85%,
+                  ${comet.color.head} 95%,
+                  ${comet.color.head} 100%
                 )`
               }}
             />
@@ -527,7 +545,7 @@ const OrbitBackdrop = () => {
           </motion.div>
         ))}
       </div>
-      {/* Constellations - sized and positioned like orbit rings, with proper aspect ratio */}
+      {/* Constellations - revamped: brighter, spin in center like orbit rings */}
       {/* To switch back to geometric orbit rings, replace CONSTELLATIONS with: 
           {[...Array(6)].map((_, idx) => (
             <span key={idx} className={`orbit orbit-${idx + 1}`} />
@@ -543,7 +561,8 @@ const OrbitBackdrop = () => {
               left: constellation.position.left,
               width: constellation.size.width,
               height: constellation.size.height,
-              pointerEvents: 'none'
+              pointerEvents: 'none',
+              transformOrigin: 'center center'
             }}
           >
             <svg
@@ -551,26 +570,37 @@ const OrbitBackdrop = () => {
               style={{
                 width: '100%',
                 height: '100%',
-                opacity: 0.12
+                opacity: 0.25
               }}
               viewBox="0 0 100 100"
               preserveAspectRatio="xMidYMid meet"
             >
+              <defs>
+                <filter id={`glow-${constellation.name}`}>
+                  <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
               <polyline
                 points={constellation.points.map(([x, y]) => `${x},${y}`).join(' ')}
                 fill="none"
-                stroke="rgba(191, 160, 90, 0.15)"
-                strokeWidth="0.8"
+                stroke="rgba(191, 160, 90, 0.4)"
+                strokeWidth="1.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                filter={`url(#glow-${constellation.name})`}
               />
               {constellation.points.map(([x, y], pointIdx) => (
                 <circle
                   key={pointIdx}
                   cx={x}
                   cy={y}
-                  r="1.2"
-                  fill="rgba(191, 160, 90, 0.4)"
+                  r="1.8"
+                  fill="rgba(191, 160, 90, 0.7)"
+                  filter={`url(#glow-${constellation.name})`}
                 />
               ))}
             </svg>
