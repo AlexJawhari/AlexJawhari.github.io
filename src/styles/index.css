@@ -120,6 +120,28 @@
   animation-duration: 7s;
 }
 
+.star-colored {
+  background: var(--star-color, rgba(255, 255, 255, 0.8));
+  box-shadow: 0 0 8px var(--star-color, rgba(255, 255, 255, 0.5));
+  animation: twinkleColor 6s ease-in-out infinite;
+}
+
+@keyframes twinkleColor {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(1);
+    background: var(--star-color, rgba(255, 255, 255, 0.8));
+    box-shadow: 0 0 8px var(--star-color, rgba(255, 255, 255, 0.5));
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.4);
+    background: var(--star-color-alt, var(--star-color, rgba(255, 255, 255, 0.8)));
+    box-shadow: 0 0 12px var(--star-color-alt, var(--star-color, rgba(255, 255, 255, 0.5)));
+  }
+}
+
 /* Comet styles - tail aligned with direction */
 .comet-container {
   position: absolute;

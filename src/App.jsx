@@ -209,11 +209,20 @@ const SECTION_VARIANTS = {
 }
 
 // Pre-generate star positions so we can keep them stable and avoid stars overlapping planets
-const STAR_COUNT = 170
+const STAR_COUNT = 220
 const PLANET_ZONES = [
   { top: 10, left: 88, radius: 12 }, // planet-1
   { top: 88, left: 15, radius: 14 }, // planet-2
   { top: 72, left: 78, radius: 14 } // planet-3
+]
+
+const STAR_COLORS = [
+  'rgba(191, 160, 90, 1)', // Gold
+  'rgba(197, 206, 209, 1)', // Silver
+  'rgba(14, 32, 71, 1)', // Deep blue
+  'rgba(12, 42, 33, 1)', // Deep green
+  'rgba(43, 24, 15, 1)', // Deep brown
+  'rgba(255, 255, 255, 1)' // White
 ]
 
 const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
@@ -235,12 +244,20 @@ const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
     return Math.sqrt(dx * dx + dy * dy) < zone.radius
   })
 
+  const hasColor = idx % 3 === 0 && !overlapsPlanet
+  const primaryColor = hasColor ? STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)] : null
+  const secondaryColor = hasColor ? STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)] : null
+
   return {
     id: idx,
     top,
     left,
     delay: idx * 0.18,
-    hidden: overlapsPlanet
+    duration: 4 + Math.random() * 4,
+    hidden: overlapsPlanet,
+    hasColor,
+    primaryColor,
+    secondaryColor
   }
 })
 
@@ -457,17 +474,27 @@ const OrbitBackdrop = () => {
       {/* Grid temporarily removed */}
       <div className="absolute inset-0 bg-noise opacity-40" />
       <div className="absolute inset-0 starfield">
-        {STARS.filter(star => !star.hidden).map(star => (
-          <span
-            key={star.id}
-            className="star"
-            style={{
-              top: `${star.top}%`,
-              left: `${star.left}%`,
-              animationDelay: `${star.delay}s`
-            }}
-          />
-        ))}
+        {STARS.filter(star => !star.hidden).map(star => {
+          const style = {
+            top: `${star.top}%`,
+            left: `${star.left}%`,
+            animationDelay: `${star.delay}s`,
+            animationDuration: `${star.duration}s`
+          }
+
+          if (star.hasColor && star.primaryColor) {
+            style['--star-color'] = star.primaryColor
+            style['--star-color-alt'] = star.secondaryColor ?? star.primaryColor
+          }
+
+          return (
+            <span
+              key={star.id}
+              className={star.hasColor ? 'star star-colored' : 'star'}
+              style={style}
+            />
+          )
+        })}
         {/* Dynamic comets with aligned tails - infrequent, slow, soft colors */}
         {comets.map(comet => (
           <motion.div
