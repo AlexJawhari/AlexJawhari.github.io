@@ -216,14 +216,8 @@ const PLANET_ZONES = [
   { top: 72, left: 78, radius: 14 } // planet-3
 ]
 
-const STAR_COLORS = [
-  'rgba(191, 160, 90, 1)', // Gold
-  'rgba(197, 206, 209, 1)', // Silver
-  'rgba(14, 32, 71, 1)', // Deep blue
-  'rgba(12, 42, 33, 1)', // Deep green
-  'rgba(43, 24, 15, 1)', // Deep brown
-  'rgba(255, 255, 255, 1)' // White
-]
+const STAR_PALETTE = ['#271002', '#E2A128', '#122E40', '#283121', '#D5D7D7']
+const DEFAULT_STAR_COLOR = '#D5D7D7'
 
 const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
   // Add more stars in top right corner (75-100% top, 70-100% left)
@@ -244,9 +238,8 @@ const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
     return Math.sqrt(dx * dx + dy * dy) < zone.radius
   })
 
-  const hasColor = idx % 3 === 0 && !overlapsPlanet
-  const primaryColor = hasColor ? STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)] : null
-  const secondaryColor = hasColor ? STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)] : null
+  const palettePick = () => STAR_PALETTE[Math.floor(Math.random() * STAR_PALETTE.length)]
+  const colorSequence = [DEFAULT_STAR_COLOR, palettePick(), palettePick()]
 
   return {
     id: idx,
@@ -255,9 +248,7 @@ const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
     delay: idx * 0.18,
     duration: 4 + Math.random() * 4,
     hidden: overlapsPlanet,
-    hasColor,
-    primaryColor,
-    secondaryColor
+    colors: colorSequence
   }
 })
 
@@ -346,11 +337,11 @@ const CONSTELLATIONS = [
 
 // Comet color palette - using the site's color palette
 const COMET_COLORS = [
-  { head: 'rgba(191, 160, 90, 0.7)', tail: 'rgba(191, 160, 90, 0.35)' }, // Gold
-  { head: 'rgba(197, 206, 209, 0.65)', tail: 'rgba(197, 206, 209, 0.3)' }, // Silver
-  { head: 'rgba(14, 32, 71, 0.7)', tail: 'rgba(14, 32, 71, 0.35)' }, // Deep blue
-  { head: 'rgba(12, 42, 33, 0.7)', tail: 'rgba(12, 42, 33, 0.35)' }, // Deep green
-  { head: 'rgba(43, 24, 15, 0.7)', tail: 'rgba(43, 24, 15, 0.35)' } // Deep brown
+  { head: 'rgba(226, 161, 40, 0.9)', tail: 'rgba(226, 161, 40, 0.45)', rgb: '226, 161, 40' }, // Gold
+  { head: 'rgba(213, 215, 215, 0.85)', tail: 'rgba(213, 215, 215, 0.4)', rgb: '213, 215, 215' }, // Silver
+  { head: 'rgba(18, 46, 64, 0.9)', tail: 'rgba(18, 46, 64, 0.45)', rgb: '18, 46, 64' }, // Deep blue
+  { head: 'rgba(40, 49, 33, 0.9)', tail: 'rgba(40, 49, 33, 0.45)', rgb: '40, 49, 33' }, // Deep green
+  { head: 'rgba(39, 16, 2, 0.9)', tail: 'rgba(39, 16, 2, 0.45)', rgb: '39, 16, 2' } // Deep brown
 ]
 
 // Comet generator - creates infrequent, slow, soft comets
@@ -482,15 +473,14 @@ const OrbitBackdrop = () => {
             animationDuration: `${star.duration}s`
           }
 
-          if (star.hasColor && star.primaryColor) {
-            style['--star-color'] = star.primaryColor
-            style['--star-color-alt'] = star.secondaryColor ?? star.primaryColor
-          }
+          style['--star-color-1'] = star.colors[0]
+          style['--star-color-2'] = star.colors[1]
+          style['--star-color-3'] = star.colors[2]
 
           return (
             <span
               key={star.id}
-              className={star.hasColor ? 'star star-colored' : 'star'}
+              className="star star-colored"
               style={style}
             />
           )
@@ -529,14 +519,13 @@ const OrbitBackdrop = () => {
               style={{
                 background: `linear-gradient(
                   to right,
-                  ${comet.color.tail}00 0%,
-                  ${comet.color.tail}30 5%,
-                  ${comet.color.tail}60 20%,
-                  ${comet.color.tail}80 40%,
-                  ${comet.color.head}95 65%,
-                  ${comet.color.head}100 80%,
-                  ${comet.color.head}90 90%,
-                  ${comet.color.head}70 100%
+                  rgba(${comet.color.rgb}, 0) 0%,
+                  rgba(${comet.color.rgb}, 0.15) 10%,
+                  rgba(${comet.color.rgb}, 0.35) 30%,
+                  rgba(${comet.color.rgb}, 0.55) 50%,
+                  rgba(${comet.color.rgb}, 0.75) 70%,
+                  rgba(${comet.color.rgb}, 0.9) 85%,
+                  rgba(${comet.color.rgb}, 1) 100%
                 )`
               }}
             />
@@ -546,8 +535,8 @@ const OrbitBackdrop = () => {
                 background: comet.color.head,
                 boxShadow: `
                   0 0 8px ${comet.color.head},
-                  0 0 15px ${comet.color.tail},
-                  0 0 25px ${comet.color.tail}40
+                  0 0 18px ${comet.color.tail},
+                  0 0 26px ${comet.color.tail}
                 `
               }}
             />

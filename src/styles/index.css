@@ -102,8 +102,8 @@
   width: 2px;
   height: 2px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+  background: #d5d7d7;
+  box-shadow: 0 0 6px rgba(213, 215, 215, 0.6);
   opacity: 0.3;
   animation: twinkle 4s ease-in-out infinite;
 }
@@ -121,9 +121,12 @@
 }
 
 .star-colored {
-  background: var(--star-color, rgba(255, 255, 255, 0.8));
-  box-shadow: 0 0 8px var(--star-color, rgba(255, 255, 255, 0.5));
-  animation: twinkleColor 6s ease-in-out infinite;
+  background: var(--star-color-1, #d5d7d7);
+  box-shadow: 0 0 8px var(--star-color-1, #d5d7d7);
+  animation-name: twinkleColor;
+  animation-duration: 6s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
 }
 
 @keyframes twinkleColor {
@@ -131,14 +134,20 @@
   100% {
     opacity: 0.25;
     transform: scale(1);
-    background: var(--star-color, rgba(255, 255, 255, 0.8));
-    box-shadow: 0 0 8px var(--star-color, rgba(255, 255, 255, 0.5));
+    background: var(--star-color-1, #d5d7d7);
+    box-shadow: 0 0 8px var(--star-color-1, #d5d7d7);
   }
-  50% {
+  33% {
+    opacity: 0.6;
+    transform: scale(1.2);
+    background: var(--star-color-2, #e2a128);
+    box-shadow: 0 0 10px var(--star-color-2, #e2a128);
+  }
+  66% {
     opacity: 0.9;
-    transform: scale(1.4);
-    background: var(--star-color-alt, var(--star-color, rgba(255, 255, 255, 0.8)));
-    box-shadow: 0 0 12px var(--star-color-alt, var(--star-color, rgba(255, 255, 255, 0.5)));
+    transform: scale(1.35);
+    background: var(--star-color-3, #122e40);
+    box-shadow: 0 0 14px var(--star-color-3, #122e40);
   }
 }
 
@@ -167,13 +176,14 @@
 
 .comet-tail {
   position: absolute;
-  width: 320px;
-  height: 3px;
+  width: 560px;
+  height: 4px;
   left: 50%;
   top: 50%;
   transform: translate(-100%, -50%);
-  filter: blur(1.5px);
+  filter: blur(2px);
   z-index: 1;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
 }
 
 @keyframes twinkle {
