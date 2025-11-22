@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react'
 import { Routes, Route, NavLink, Link, useParams, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 
 /* -------------------------------------------------------------------------- */
 /*                             Core portfolio data                            */
@@ -268,29 +268,35 @@ const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
   }
 })
 
-const PLANETS = [
-  {
-    id: 'azure',
-    className: 'planet planet--azure',
-    base: { top: '6%', left: '74%' },
-    xRange: [0, -260],
-    yRange: [0, 260]
-  },
-  {
-    id: 'obsidian',
-    className: 'planet planet--obsidian',
-    base: { top: '80%', left: '8%' },
-    xRange: [0, 220],
-    yRange: [0, -310]
-  },
-  {
-    id: 'ember',
-    className: 'planet planet--ember planet--halo',
-    base: { top: '70%', left: '82%' },
-    xRange: [0, -80],
-    yRange: [0, 220]
-  }
-]
+// Generate static planets with random positions and sizes on page load
+// This eliminates scroll-based updates and improves performance
+const generateStaticPlanets = () => {
+  const planetTypes = [
+    { id: 'azure', className: 'planet planet--azure', baseSize: 140 },
+    { id: 'obsidian', className: 'planet planet--obsidian', baseSize: 110 },
+    { id: 'ember', className: 'planet planet--ember planet--halo', baseSize: 100 }
+  ]
+  
+  return planetTypes.map(planet => {
+    // Random position (5-95% to keep planets visible)
+    const top = 5 + Math.random() * 90
+    const left = 5 + Math.random() * 90
+    
+    // Random size variation: 80% to 120% of base size
+    const sizeMultiplier = 0.8 + Math.random() * 0.4
+    const size = Math.round(planet.baseSize * sizeMultiplier)
+    
+    return {
+      ...planet,
+      top: `${top}%`,
+      left: `${left}%`,
+      size: `${size}px`
+    }
+  })
+}
+
+// Generate planets once on module load
+const STATIC_PLANETS = generateStaticPlanets()
 
 const MAX_SHOOTING_STARS = 3
 const SHOOTING_STAR_MIN_SPEED = 0.8
@@ -499,78 +505,16 @@ const GlassCard = ({ children, className = '' }) => (
   </div>
 )
 
-// Separate scroll-based background component that uses CSS custom properties
-// This avoids React re-renders during scroll by updating CSS variables directly
+// Optimized background component - completely static to eliminate scroll lag
+// All elements are static or use CSS animations only (no JavaScript scroll updates)
 const ScrollBasedBackground = () => {
-  const containerRef = useRef(null)
-  const rafRef = useRef(null)
-  const scrollProgressRef = useRef(0)
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !containerRef.current) return
-
-    const updateScrollProgress = () => {
-      if (!containerRef.current) return
-
-      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-      const progress = scrollHeight > 0 ? Math.max(0, Math.min(1, scrollTop / scrollHeight)) : 0
-      scrollProgressRef.current = progress
-
-      // Update CSS custom properties directly - no React re-render needed
-      const root = containerRef.current
-      root.style.setProperty('--scroll-progress', progress.toString())
-      
-      // Calculate derived values for smooth transitions
-      const starOpacity = progress < 0.5 ? 0.5 + progress : 1 - (progress - 0.5) * 0.6
-      const auroraOffsetY = progress * -260
-      const auroraOpacity = progress < 0.3 ? 0.9 - progress * 0.67 : 0.7 - (progress - 0.3) * 0.43
-
-      root.style.setProperty('--star-opacity', starOpacity.toString())
-      root.style.setProperty('--aurora-offset-y', `${auroraOffsetY}px`)
-      root.style.setProperty('--aurora-opacity', auroraOpacity.toString())
-
-      // Update planet positions using CSS custom properties
-      PLANETS.forEach((planet, idx) => {
-        const x = progress * (planet.xRange[1] - planet.xRange[0]) + planet.xRange[0]
-        const y = progress * (planet.yRange[1] - planet.yRange[0]) + planet.yRange[0]
-        root.style.setProperty(`--planet-${idx}-x`, `${x}px`)
-        root.style.setProperty(`--planet-${idx}-y`, `${y}px`)
-      })
-    }
-
-    // Throttle scroll events using requestAnimationFrame for smooth performance
-    let ticking = false
-    const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          updateScrollProgress()
-          ticking = false
-        })
-        ticking = true
-      }
-    }
-
-    // Initial update
-    updateScrollProgress()
-
-    // Use passive listeners for better scroll performance
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('resize', handleScroll, { passive: true })
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('resize', handleScroll)
-    }
-  }, [])
-
   return (
-    <div ref={containerRef} className="scroll-based-background fixed inset-0 -z-10 pointer-events-none">
+    <div className="fixed inset-0 -z-10 pointer-events-none">
       <div className="absolute inset-0 bg-[#040507]" />
       <div className="absolute inset-0 bg-radial" style={{ opacity: 1 }} />
       <div className="absolute inset-0 bg-noise opacity-40" />
       
-      {/* Stars layer - static, no scroll updates needed */}
+      {/* Stars layer - static, CSS animations only */}
       <div className="absolute inset-0 starfield">
         {STARS.filter(star => !star.hidden).map(star => {
           const style = {
@@ -597,7 +541,7 @@ const ScrollBasedBackground = () => {
         <ShootingStarsLayer />
       </div>
 
-      {/* Orbit rings - static rotation, no scroll updates */}
+      {/* Orbit rings - static rotation, CSS animations only */}
       <div className="absolute inset-0">
         {[...Array(6)].map((_, idx) => {
           // Generate random initial rotation for each orbit (0-360 degrees)
@@ -612,30 +556,25 @@ const ScrollBasedBackground = () => {
         })}
       </div>
 
-      {/* Planets - positioned via CSS custom properties updated by scroll */}
+      {/* Static planets - random positions and sizes, no scroll updates */}
       <div className="absolute inset-0" style={{ zIndex: 10 }}>
-        {PLANETS.map((planet, idx) => (
+        {STATIC_PLANETS.map(planet => (
           <span
             key={planet.id}
             className={planet.className}
             style={{ 
-              top: planet.base.top, 
-              left: planet.base.left,
-              transform: `translate(var(--planet-${idx}-x, 0px), var(--planet-${idx}-y, 0px)) translateZ(0)`,
+              top: planet.top, 
+              left: planet.left,
+              width: planet.size,
+              height: planet.size,
               zIndex: 10
             }}
           />
         ))}
       </div>
 
-      {/* Aurora - positioned via CSS custom properties */}
-      <div 
-        className="absolute inset-0 aurora" 
-        style={{ 
-          transform: `translateY(var(--aurora-offset-y, 0px)) translateZ(0)`,
-          opacity: 'var(--aurora-opacity, 0.9)'
-        }} 
-      />
+      {/* Static aurora - no scroll updates */}
+      <div className="absolute inset-0 aurora" />
     </div>
   )
 }

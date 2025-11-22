@@ -4,21 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Scroll-based background container - uses CSS custom properties for performance */
-.scroll-based-background {
-  /* CSS custom properties updated via JavaScript, avoiding React re-renders */
-  --scroll-progress: 0;
-  --star-opacity: 0.5;
-  --aurora-offset-y: 0px;
-  --aurora-opacity: 0.9;
-  /* Planet positions initialized to 0 */
-  --planet-0-x: 0px;
-  --planet-0-y: 0px;
-  --planet-1-x: 0px;
-  --planet-1-y: 0px;
-  --planet-2-x: 0px;
-  --planet-2-y: 0px;
-}
+/* Background container - now completely static for maximum performance */
 
 @layer base {
   * {
@@ -86,13 +72,15 @@
   transform: translateZ(0);
 }
 
-/* Orbit rings - positioned normally, centered via transform-origin */
+/* Orbit rings - centered properly using transform translate */
 /* Each orbit has a random initial rotation set via CSS variable in JS */
+/* Using transform: translate(-50%, -50%) to center the element at the specified top/left point */
 .orbit-1 { 
   width: 40%; 
   height: 28%; 
   top: 10%; 
   left: 20%; 
+  transform: translate(-50%, -50%);
   --orbit-duration: 24s;
 }
 .orbit-2 { 
@@ -100,6 +88,7 @@
   height: 42%; 
   top: 20%; 
   left: 40%; 
+  transform: translate(-50%, -50%);
   --orbit-duration: 30s;
 }
 .orbit-3 { 
@@ -107,6 +96,7 @@
   height: 45%; 
   top: 12%; 
   left: 5%; 
+  transform: translate(-50%, -50%);
   --orbit-duration: 26s;
 }
 .orbit-4 { 
@@ -114,6 +104,7 @@
   height: 28%; 
   top: 30%; 
   left: 30%; 
+  transform: translate(-50%, -50%);
   --orbit-duration: 32s;
 }
 .orbit-5 { 
@@ -121,6 +112,7 @@
   height: 35%; 
   top: 15%; 
   left: 15%; 
+  transform: translate(-50%, -50%);
   --orbit-duration: 36s;
 }
 .orbit-6 { 
@@ -128,15 +120,16 @@
   height: 40%; 
   top: 5%; 
   left: 20%; 
+  transform: translate(-50%, -50%);
   --orbit-duration: 40s;
 }
 
 @keyframes orbitSpin {
   from {
-    transform: rotate(var(--orbit-initial-rotation, 0deg)) translateZ(0);
+    transform: translate(-50%, -50%) rotate(var(--orbit-initial-rotation, 0deg)) translateZ(0);
   }
   to {
-    transform: rotate(calc(var(--orbit-initial-rotation, 0deg) + 360deg)) translateZ(0);
+    transform: translate(-50%, -50%) rotate(calc(var(--orbit-initial-rotation, 0deg) + 360deg)) translateZ(0);
   }
 }
 
@@ -292,9 +285,9 @@
   opacity: 0.6;
 }
 
+/* Planet variants - sizes are now set inline for random sizing */
 .planet--azure {
-  width: 140px;
-  height: 140px;
+  /* Width and height set inline for dynamic sizing */
   background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.8), rgba(115, 165, 255, 0.7) 40%, rgba(10, 16, 28, 1) 85%);
   box-shadow:
     0 0 45px rgba(90, 140, 255, 0.45),
@@ -303,8 +296,7 @@
 }
 
 .planet--obsidian {
-  width: 110px;
-  height: 110px;
+  /* Width and height set inline for dynamic sizing */
   background: radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.75), rgba(70, 255, 205, 0.4) 35%, rgba(7, 20, 14, 1) 80%);
   box-shadow:
     0 0 45px rgba(40, 120, 90, 0.35),
@@ -313,8 +305,7 @@
 }
 
 .planet--ember {
-  width: 100px;
-  height: 100px;
+  /* Width and height set inline for dynamic sizing */
   background: radial-gradient(circle at 25% 30%, rgba(255, 248, 200, 0.85), rgba(255, 150, 90, 0.6) 40%, rgba(25, 10, 5, 1) 80%);
   box-shadow:
     0 0 30px rgba(255, 140, 70, 0.35),
