@@ -270,6 +270,7 @@ const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
 
 // Generate static planets with random positions and sizes on page load
 // This eliminates scroll-based updates and improves performance
+// Includes collision detection to prevent planets from overlapping
 const generateStaticPlanets = () => {
   const planetTypes = [
     { id: 'azure', className: 'planet planet--azure', baseSize: 140 },
@@ -277,22 +278,50 @@ const generateStaticPlanets = () => {
     { id: 'ember', className: 'planet planet--ember planet--halo', baseSize: 100 }
   ]
   
-  return planetTypes.map(planet => {
-    // Random position (5-95% to keep planets visible)
-    const top = 5 + Math.random() * 90
-    const left = 5 + Math.random() * 90
-    
+  const planets = []
+  const minDistance = 15 // Minimum distance between planet centers (in %)
+  const maxAttempts = 100 // Maximum attempts to find a non-overlapping position
+  
+  planetTypes.forEach(planet => {
     // Random size variation: 80% to 120% of base size
     const sizeMultiplier = 0.8 + Math.random() * 0.4
     const size = Math.round(planet.baseSize * sizeMultiplier)
     
-    return {
+    let top, left
+    let attempts = 0
+    let validPosition = false
+    
+    // Try to find a position that doesn't overlap with existing planets
+    while (!validPosition && attempts < maxAttempts) {
+      // Random position (5-95% to keep planets visible)
+      top = 5 + Math.random() * 90
+      left = 5 + Math.random() * 90
+      
+      // Check distance from all existing planets
+      validPosition = planets.every(existingPlanet => {
+        // Parse percentage values (remove % and convert to number)
+        const existingLeft = parseFloat(existingPlanet.left.replace('%', ''))
+        const existingTop = parseFloat(existingPlanet.top.replace('%', ''))
+        const dx = left - existingLeft
+        const dy = top - existingTop
+        const distance = Math.sqrt(dx * dx + dy * dy)
+        return distance >= minDistance
+      })
+      
+      attempts++
+    }
+    
+    // If we couldn't find a non-overlapping position, use the last attempted position
+    // (This should rarely happen, but prevents infinite loops)
+    planets.push({
       ...planet,
       top: `${top}%`,
       left: `${left}%`,
       size: `${size}px`
-    }
+    })
   })
+  
+  return planets
 }
 
 // Generate planets once on module load
@@ -363,26 +392,64 @@ const createShootingStar = () => {
   }
 }
 
+// Shooting stars layer using direct DOM manipulation to avoid React re-renders
+// This eliminates lag during scroll by completely bypassing React's render cycle
 const ShootingStarsLayer = () => {
-  const [stars, setStars] = useState([])
+  const containerRef = useRef(null)
+  const starsRef = useRef(new Map()) // Map of star ID to DOM element
   const spawnTimeout = useRef(null)
   const animationFrame = useRef(null)
 
-  // Spawn shooting stars at random intervals
-  // Uses recursive setTimeout to continuously spawn new stars while maintaining max count
+  // Spawn shooting stars at random intervals using direct DOM manipulation
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || !containerRef.current) return
 
     const scheduleSpawn = () => {
       spawnTimeout.current = window.setTimeout(() => {
-        setStars(prev => {
-          // Don't spawn if we've reached the maximum number of shooting stars
-          if (prev.length >= MAX_SHOOTING_STARS) return prev
-          const next = createShootingStar()
-          if (!next) return prev
-          return [...prev, next]
-        })
-        // Schedule next spawn - recursive pattern ensures continuous spawning
+        // Don't spawn if we've reached the maximum number of shooting stars
+        if (starsRef.current.size >= MAX_SHOOTING_STARS) {
+          scheduleSpawn()
+          return
+        }
+
+        const star = createShootingStar()
+        if (!star || !containerRef.current) {
+          scheduleSpawn()
+          return
+        }
+
+        // Create DOM element directly - no React state
+        const container = document.createElement('div')
+        container.className = 'comet-container'
+        container.dataset.starId = star.id
+
+        const tail = document.createElement('div')
+        tail.className = 'comet-tail'
+        tail.style.width = `${star.tailLength}px`
+        tail.style.background = `linear-gradient(
+          to right,
+          rgba(${star.color.rgb}, 0.8) 0%,
+          rgba(${star.color.rgb}, 0.5) 35%,
+          rgba(${star.color.rgb}, 0.2) 70%,
+          rgba(${star.color.rgb}, 0) 100%
+        )`
+
+        const head = document.createElement('div')
+        head.className = 'comet-head'
+        head.style.background = star.color.head
+        head.style.boxShadow = `
+          0 0 8px ${star.color.head},
+          0 0 18px ${star.color.tail},
+          0 0 26px ${star.color.tail}
+        `
+
+        container.appendChild(tail)
+        container.appendChild(head)
+        containerRef.current.appendChild(container)
+
+        // Store star data and DOM element
+        starsRef.current.set(star.id, { ...star, element: container })
+
         scheduleSpawn()
       }, SHOOTING_STAR_MIN_DELAY + Math.random() * (SHOOTING_STAR_MAX_DELAY - SHOOTING_STAR_MIN_DELAY))
     }
@@ -394,39 +461,47 @@ const ShootingStarsLayer = () => {
     }
   }, [])
 
+  // Animation loop using direct DOM manipulation - completely independent of React
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || !containerRef.current) return
 
-    // Animation loop for shooting stars - continues smoothly during scroll
-    // Using requestAnimationFrame ensures it runs at optimal frame rate
     const animate = () => {
-      setStars(prev =>
-        prev
-          .map(star => {
-            const radians = (star.angle * Math.PI) / 180
-            const newX = star.x + star.speed * Math.cos(radians)
-            const newY = star.y + star.speed * Math.sin(radians)
-            const distance = star.distance + star.speed
-            const scale = 1 + distance / 600
+      starsRef.current.forEach((star, id) => {
+        const radians = (star.angle * Math.PI) / 180
+        const newX = star.x + star.speed * Math.cos(radians)
+        const newY = star.y + star.speed * Math.sin(radians)
+        const distance = star.distance + star.speed
+        const scale = 1 + distance / 600
 
-            // Remove stars that have moved off-screen
-            if (
-              newX < -80 ||
-              newX > window.innerWidth + 80 ||
-              newY < -80 ||
-              newY > window.innerHeight + 80
-            ) {
-              return null
-            }
+        // Remove stars that have moved off-screen
+        if (
+          newX < -80 ||
+          newX > window.innerWidth + 80 ||
+          newY < -80 ||
+          newY > window.innerHeight + 80
+        ) {
+          if (star.element && star.element.parentNode) {
+            star.element.parentNode.removeChild(star.element)
+          }
+          starsRef.current.delete(id)
+          return
+        }
 
-            return { ...star, x: newX, y: newY, distance, scale }
-          })
-          .filter(Boolean)
-      )
+        // Update star data
+        star.x = newX
+        star.y = newY
+        star.distance = distance
+        star.scale = scale
+
+        // Update DOM directly - no React re-render
+        if (star.element) {
+          star.element.style.transform = `translate(${newX}px, ${newY}px) rotate(${star.angle}deg) scale(${scale})`
+        }
+      })
+
       animationFrame.current = requestAnimationFrame(animate)
     }
 
-    // Start animation loop - this continues even during scroll events
     animationFrame.current = requestAnimationFrame(animate)
 
     return () => {
@@ -434,44 +509,7 @@ const ShootingStarsLayer = () => {
     }
   }, [])
 
-  return (
-    <div className="absolute inset-0">
-      {stars.map(star => (
-        <div
-          key={star.id}
-          className="comet-container"
-          style={{
-            transform: `translate(${star.x}px, ${star.y}px) rotate(${star.angle}deg) scale(${star.scale})`
-          }}
-        >
-          <div
-            className="comet-tail"
-            style={{
-              width: `${star.tailLength}px`,
-              background: `linear-gradient(
-                to right,
-                rgba(${star.color.rgb}, 0.8) 0%,
-                rgba(${star.color.rgb}, 0.5) 35%,
-                rgba(${star.color.rgb}, 0.2) 70%,
-                rgba(${star.color.rgb}, 0) 100%
-              )`
-            }}
-          />
-          <div
-            className="comet-head"
-            style={{
-              background: star.color.head,
-              boxShadow: `
-                0 0 8px ${star.color.head},
-                0 0 18px ${star.color.tail},
-                0 0 26px ${star.color.tail}
-              `
-            }}
-          />
-        </div>
-      ))}
-    </div>
-  )
+  return <div ref={containerRef} className="absolute inset-0" />
 }
 
 /* -------------------------------------------------------------------------- */

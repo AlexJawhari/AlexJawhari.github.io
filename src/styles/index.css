@@ -63,24 +63,23 @@
   border-radius: 999px;
   will-change: transform;
   /* Center rotation point - ensures rotation around element's geometric center */
-  transform-origin: 50% 50%;
+  transform-origin: center center;
   /* GPU acceleration for smooth animation */
   backface-visibility: hidden;
   /* Use CSS custom property for initial rotation, then animate from there */
   animation: orbitSpin var(--orbit-duration, 24s) linear infinite;
-  /* Initial transform - animation will override this */
-  transform: translateZ(0);
 }
 
-/* Orbit rings - centered properly using transform translate */
+/* Orbit rings - positioned by center point using margin adjustments */
 /* Each orbit has a random initial rotation set via CSS variable in JS */
-/* Using transform: translate(-50%, -50%) to center the element at the specified top/left point */
+/* Using negative margins to center the element at the specified top/left point */
 .orbit-1 { 
   width: 40%; 
   height: 28%; 
   top: 10%; 
   left: 20%; 
-  transform: translate(-50%, -50%);
+  margin-top: -14%;  /* Half of height (28% / 2) */
+  margin-left: -20%; /* Half of width (40% / 2) */
   --orbit-duration: 24s;
 }
 .orbit-2 { 
@@ -88,7 +87,8 @@
   height: 42%; 
   top: 20%; 
   left: 40%; 
-  transform: translate(-50%, -50%);
+  margin-top: -21%;  /* Half of height (42% / 2) */
+  margin-left: -15%; /* Half of width (30% / 2) */
   --orbit-duration: 30s;
 }
 .orbit-3 { 
@@ -96,7 +96,8 @@
   height: 45%; 
   top: 12%; 
   left: 5%; 
-  transform: translate(-50%, -50%);
+  margin-top: -22.5%; /* Half of height (45% / 2) */
+  margin-left: -25%;  /* Half of width (50% / 2) */
   --orbit-duration: 26s;
 }
 .orbit-4 { 
@@ -104,7 +105,8 @@
   height: 28%; 
   top: 30%; 
   left: 30%; 
-  transform: translate(-50%, -50%);
+  margin-top: -14%;  /* Half of height (28% / 2) */
+  margin-left: -19%; /* Half of width (38% / 2) */
   --orbit-duration: 32s;
 }
 .orbit-5 { 
@@ -112,7 +114,8 @@
   height: 35%; 
   top: 15%; 
   left: 15%; 
-  transform: translate(-50%, -50%);
+  margin-top: -17.5%; /* Half of height (35% / 2) */
+  margin-left: -21%;  /* Half of width (42% / 2) */
   --orbit-duration: 36s;
 }
 .orbit-6 { 
@@ -120,16 +123,17 @@
   height: 40%; 
   top: 5%; 
   left: 20%; 
-  transform: translate(-50%, -50%);
+  margin-top: -20%;  /* Half of height (40% / 2) */
+  margin-left: -22.5%; /* Half of width (45% / 2) */
   --orbit-duration: 40s;
 }
 
 @keyframes orbitSpin {
   from {
-    transform: translate(-50%, -50%) rotate(var(--orbit-initial-rotation, 0deg)) translateZ(0);
+    transform: rotate(var(--orbit-initial-rotation, 0deg)) translateZ(0);
   }
   to {
-    transform: translate(-50%, -50%) rotate(calc(var(--orbit-initial-rotation, 0deg) + 360deg)) translateZ(0);
+    transform: rotate(calc(var(--orbit-initial-rotation, 0deg) + 360deg)) translateZ(0);
   }
 }
 
