@@ -4,6 +4,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Scroll-based background container - uses CSS custom properties for performance */
+.scroll-based-background {
+  /* CSS custom properties updated via JavaScript, avoiding React re-renders */
+  --scroll-progress: 0;
+  --star-opacity: 0.5;
+  --aurora-offset-y: 0px;
+  --aurora-opacity: 0.9;
+  /* Planet positions initialized to 0 */
+  --planet-0-x: 0px;
+  --planet-0-y: 0px;
+  --planet-1-x: 0px;
+  --planet-1-y: 0px;
+  --planet-2-x: 0px;
+  --planet-2-y: 0px;
+}
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -57,30 +73,70 @@
 /* Orbit rings - rotating background elements */
 .orbit {
   position: absolute;
-  border: 1px solid rgba(191, 160, 90, 0.15);
+  border: 2px solid rgba(191, 160, 90, 0.2);
   border-radius: 999px;
-  animation: orbitSpin 24s linear infinite;
   will-change: transform;
-  /* Center rotation point for proper rotation */
-  transform-origin: center center;
+  /* Center rotation point - ensures rotation around element's geometric center */
+  transform-origin: 50% 50%;
   /* GPU acceleration for smooth animation */
-  transform: translateZ(0);
   backface-visibility: hidden;
+  /* Use CSS custom property for initial rotation, then animate from there */
+  animation: orbitSpin var(--orbit-duration, 24s) linear infinite;
+  /* Initial rotation set via CSS variable */
+  transform: rotate(var(--orbit-initial-rotation, 0deg)) translateZ(0);
 }
 
-.orbit-1 { width: 40%; height: 28%; top: 10%; left: 20%; }
-.orbit-2 { width: 30%; height: 42%; top: 20%; left: 40%; animation-duration: 30s; }
-.orbit-3 { width: 50%; height: 45%; top: 12%; left: 5%; animation-duration: 26s; }
-.orbit-4 { width: 38%; height: 28%; top: 30%; left: 30%; animation-duration: 32s; }
-.orbit-5 { width: 42%; height: 35%; top: 15%; left: 15%; animation-duration: 36s; }
-.orbit-6 { width: 45%; height: 40%; top: 5%; left: 20%; animation-duration: 40s; }
+/* Orbit rings - positioned normally, centered via transform-origin */
+/* Each orbit has a random initial rotation set via CSS variable in JS */
+.orbit-1 { 
+  width: 40%; 
+  height: 28%; 
+  top: 10%; 
+  left: 20%; 
+  --orbit-duration: 24s;
+}
+.orbit-2 { 
+  width: 30%; 
+  height: 42%; 
+  top: 20%; 
+  left: 40%; 
+  --orbit-duration: 30s;
+}
+.orbit-3 { 
+  width: 50%; 
+  height: 45%; 
+  top: 12%; 
+  left: 5%; 
+  --orbit-duration: 26s;
+}
+.orbit-4 { 
+  width: 38%; 
+  height: 28%; 
+  top: 30%; 
+  left: 30%; 
+  --orbit-duration: 32s;
+}
+.orbit-5 { 
+  width: 42%; 
+  height: 35%; 
+  top: 15%; 
+  left: 15%; 
+  --orbit-duration: 36s;
+}
+.orbit-6 { 
+  width: 45%; 
+  height: 40%; 
+  top: 5%; 
+  left: 20%; 
+  --orbit-duration: 40s;
+}
 
 @keyframes orbitSpin {
   from {
-    transform: rotate(0deg);
+    transform: rotate(var(--orbit-initial-rotation, 0deg)) translateZ(0);
   }
   to {
-    transform: rotate(360deg);
+    transform: rotate(calc(var(--orbit-initial-rotation, 0deg) + 360deg)) translateZ(0);
   }
 }
 

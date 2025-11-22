@@ -209,12 +209,14 @@ const SECTION_VARIANTS = {
 }
 
 // Pre-generate star positions so we can keep them stable and avoid stars overlapping planets
-// Doubled star count for better visual density, evenly distributed
-const STAR_COUNT = 600
+// Random star count between 500-1000 for variety on each page load
+const STAR_COUNT = 500 + Math.floor(Math.random() * 501) // Random between 500-1000
+// Reduced planet zone radius to allow more stars near planets
+// Stars will still be hidden if they're directly behind planets, but more will show
 const PLANET_ZONES = [
-  { top: 10, left: 88, radius: 12 }, // planet-1
-  { top: 88, left: 15, radius: 14 }, // planet-2
-  { top: 72, left: 78, radius: 14 } // planet-3
+  { top: 10, left: 88, radius: 8 }, // planet-1 (reduced from 12)
+  { top: 88, left: 15, radius: 9 }, // planet-2 (reduced from 14)
+  { top: 72, left: 78, radius: 9 } // planet-3 (reduced from 14)
 ]
 
 const STAR_PALETTE = ['#271002', '#9B081C', '#E2A128', '#122E40', '#283121', '#D5D7D7']
@@ -497,29 +499,78 @@ const GlassCard = ({ children, className = '' }) => (
   </div>
 )
 
-const OrbitBackdrop = () => {
-  // Use useScroll directly without useSpring for better performance during scroll
-  // useSpring was causing lag by trying to smooth already-smooth scroll events
-  const { scrollYProgress } = useScroll()
-  
-  // Direct transforms are GPU-accelerated and don't block during scroll
-  const starOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.5, 1, 0.7])
-  const auroraOffsetY = useTransform(scrollYProgress, [0, 1], [0, -260])
-  const auroraOpacity = useTransform(scrollYProgress, [0, 0.3, 1], [0.9, 0.7, 0.4])
-  
-  // Planet transforms - using direct transforms for smooth, lag-free movement
-  const planetTransforms = PLANETS.map(planet => ({
-    ...planet,
-    x: useTransform(scrollYProgress, [0, 1], planet.xRange),
-    y: useTransform(scrollYProgress, [0, 1], planet.yRange)
-  }))
-  
+// Separate scroll-based background component that uses CSS custom properties
+// This avoids React re-renders during scroll by updating CSS variables directly
+const ScrollBasedBackground = () => {
+  const containerRef = useRef(null)
+  const rafRef = useRef(null)
+  const scrollProgressRef = useRef(0)
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !containerRef.current) return
+
+    const updateScrollProgress = () => {
+      if (!containerRef.current) return
+
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+      const progress = scrollHeight > 0 ? Math.max(0, Math.min(1, scrollTop / scrollHeight)) : 0
+      scrollProgressRef.current = progress
+
+      // Update CSS custom properties directly - no React re-render needed
+      const root = containerRef.current
+      root.style.setProperty('--scroll-progress', progress.toString())
+      
+      // Calculate derived values for smooth transitions
+      const starOpacity = progress < 0.5 ? 0.5 + progress : 1 - (progress - 0.5) * 0.6
+      const auroraOffsetY = progress * -260
+      const auroraOpacity = progress < 0.3 ? 0.9 - progress * 0.67 : 0.7 - (progress - 0.3) * 0.43
+
+      root.style.setProperty('--star-opacity', starOpacity.toString())
+      root.style.setProperty('--aurora-offset-y', `${auroraOffsetY}px`)
+      root.style.setProperty('--aurora-opacity', auroraOpacity.toString())
+
+      // Update planet positions using CSS custom properties
+      PLANETS.forEach((planet, idx) => {
+        const x = progress * (planet.xRange[1] - planet.xRange[0]) + planet.xRange[0]
+        const y = progress * (planet.yRange[1] - planet.yRange[0]) + planet.yRange[0]
+        root.style.setProperty(`--planet-${idx}-x`, `${x}px`)
+        root.style.setProperty(`--planet-${idx}-y`, `${y}px`)
+      })
+    }
+
+    // Throttle scroll events using requestAnimationFrame for smooth performance
+    let ticking = false
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateScrollProgress()
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    // Initial update
+    updateScrollProgress()
+
+    // Use passive listeners for better scroll performance
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('resize', handleScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleScroll)
+    }
+  }, [])
+
   return (
-    <div className="fixed inset-0 -z-10 pointer-events-none">
+    <div ref={containerRef} className="scroll-based-background fixed inset-0 -z-10 pointer-events-none">
       <div className="absolute inset-0 bg-[#040507]" />
-      <motion.div className="absolute inset-0 bg-radial" style={{ opacity: 1 }} />
-      {/* Grid temporarily removed */}
+      <div className="absolute inset-0 bg-radial" style={{ opacity: 1 }} />
       <div className="absolute inset-0 bg-noise opacity-40" />
+      
+      {/* Stars layer - static, no scroll updates needed */}
       <div className="absolute inset-0 starfield">
         {STARS.filter(star => !star.hidden).map(star => {
           const style = {
@@ -545,29 +596,53 @@ const OrbitBackdrop = () => {
         })}
         <ShootingStarsLayer />
       </div>
+
+      {/* Orbit rings - static rotation, no scroll updates */}
       <div className="absolute inset-0">
-        {[...Array(6)].map((_, idx) => (
-          <span key={idx} className={`orbit orbit-${idx + 1}`} />
-        ))}
+        {[...Array(6)].map((_, idx) => {
+          // Generate random initial rotation for each orbit (0-360 degrees)
+          const initialRotation = Math.random() * 360
+          return (
+            <span 
+              key={idx} 
+              className={`orbit orbit-${idx + 1}`}
+              style={{ '--orbit-initial-rotation': `${initialRotation}deg` }}
+            />
+          )
+        })}
       </div>
+
+      {/* Planets - positioned via CSS custom properties updated by scroll */}
       <div className="absolute inset-0" style={{ zIndex: 10 }}>
-        {planetTransforms.map(planet => (
-          <motion.span
+        {PLANETS.map((planet, idx) => (
+          <span
             key={planet.id}
             className={planet.className}
             style={{ 
               top: planet.base.top, 
-              left: planet.base.left, 
-              x: planet.x, 
-              y: planet.y,
+              left: planet.base.left,
+              transform: `translate(var(--planet-${idx}-x, 0px), var(--planet-${idx}-y, 0px)) translateZ(0)`,
               zIndex: 10
             }}
           />
         ))}
       </div>
-      <motion.div className="absolute inset-0 aurora" style={{ y: auroraOffsetY, opacity: auroraOpacity }} />
+
+      {/* Aurora - positioned via CSS custom properties */}
+      <div 
+        className="absolute inset-0 aurora" 
+        style={{ 
+          transform: `translateY(var(--aurora-offset-y, 0px)) translateZ(0)`,
+          opacity: 'var(--aurora-opacity, 0.9)'
+        }} 
+      />
     </div>
   )
+}
+
+const OrbitBackdrop = () => {
+  // Use the optimized scroll-based background component
+  return <ScrollBasedBackground />
 }
 
 /* -------------------------------------------------------------------------- */
