@@ -54,13 +54,18 @@
   mix-blend-mode: screen;
 }
 
-/* Old orbit rings - kept for reference if switching back */
+/* Orbit rings - rotating background elements */
 .orbit {
   position: absolute;
-  border: 1px solid rgba(191, 160, 90, 0.08);
+  border: 1px solid rgba(191, 160, 90, 0.15);
   border-radius: 999px;
   animation: orbitSpin 24s linear infinite;
   will-change: transform;
+  /* Center rotation point for proper rotation */
+  transform-origin: center center;
+  /* GPU acceleration for smooth animation */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .orbit-1 { width: 40%; height: 28%; top: 10%; left: 20%; }
@@ -114,6 +119,10 @@
   background: var(--star-color-1, #d5d7d7);
   box-shadow: 0 0 8px var(--star-color-1, #d5d7d7);
   animation: twinkleColor var(--star-twinkle-duration, 8s) ease-in-out infinite;
+  /* GPU acceleration for smooth animation during scroll */
+  will-change: transform, opacity, background-color;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 @keyframes twinkleColor {
@@ -153,6 +162,9 @@
   transform-origin: center center;
   will-change: transform, opacity;
   z-index: 2;
+  /* GPU acceleration to prevent lag during scroll */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .comet-head {

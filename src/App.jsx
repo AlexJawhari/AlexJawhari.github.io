@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react'
 import { Routes, Route, NavLink, Link, useParams, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 
 /* -------------------------------------------------------------------------- */
 /*                             Core portfolio data                            */
@@ -209,7 +209,8 @@ const SECTION_VARIANTS = {
 }
 
 // Pre-generate star positions so we can keep them stable and avoid stars overlapping planets
-const STAR_COUNT = 300
+// Doubled star count for better visual density, evenly distributed
+const STAR_COUNT = 600
 const PLANET_ZONES = [
   { top: 10, left: 88, radius: 12 }, // planet-1
   { top: 88, left: 15, radius: 14 }, // planet-2
@@ -224,27 +225,33 @@ const SHOOTING_STAR_COLORS = [
   { head: 'rgba(100, 180, 255, 0.9)', tail: 'rgba(100, 180, 255, 0.45)', rgb: '100, 180, 255' }
 ]
 
+// Generate star positions with even distribution across viewport
+// Uses grid-based positioning for uniform spread, then adds randomness for natural appearance
 const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
-  // Add more stars in top right corner (75-100% top, 70-100% left)
-  let top, left
-  if (idx < 20) {
-    // First 20 stars: favor top right corner
-    top = 75 + Math.random() * 25 // 75-100%
-    left = 70 + Math.random() * 30 // 70-100%
-  } else {
-    // Rest: random distribution
-    top = Math.random() * 100
-    left = Math.random() * 100
-  }
+  // Calculate grid dimensions for even distribution
+  // Using square root ensures roughly equal rows and columns
+  const gridSize = Math.ceil(Math.sqrt(STAR_COUNT))
+  const gridX = idx % gridSize
+  const gridY = Math.floor(idx / gridSize)
+  const cellWidth = 100 / gridSize
+  const cellHeight = 100 / gridSize
+  
+  // Position within grid cell with slight randomness for natural look
+  // This prevents stars from appearing in perfect grid lines
+  const top = (gridY * cellHeight) + (Math.random() * cellHeight)
+  const left = (gridX * cellWidth) + (Math.random() * cellWidth)
 
+  // Check if star overlaps with planet zones - hide stars that would be behind planets
   const overlapsPlanet = PLANET_ZONES.some(zone => {
     const dx = left - zone.left
     const dy = top - zone.top
     return Math.sqrt(dx * dx + dy * dy) < zone.radius
   })
 
+  // Random color picker from palette
   const palettePick = () => STAR_PALETTE[Math.floor(Math.random() * STAR_PALETTE.length)]
-  // Create a sequence that cycles through all palette colors randomly
+  // Create color sequence for twinkling animation - cycles through all palette colors
+  // Each star will animate through 5 randomly selected colors from the palette
   const colorSequence = Array.from({ length: 5 }, () => palettePick())
 
   return {
@@ -286,11 +293,18 @@ const PLANETS = [
 const MAX_SHOOTING_STARS = 3
 const SHOOTING_STAR_MIN_SPEED = 0.8
 const SHOOTING_STAR_MAX_SPEED = 1.6
-const SHOOTING_STAR_MIN_DELAY = 2800
-const SHOOTING_STAR_MAX_DELAY = 5500
+const SHOOTING_STAR_MIN_DELAY = 3000
+const SHOOTING_STAR_MAX_DELAY = 6000
 
+/**
+ * Creates a new shooting star with random properties
+ * Shooting stars spawn from random edges of the screen and travel diagonally
+ * @returns {Object|null} Shooting star object with position, angle, speed, and color
+ */
 const createShootingStar = () => {
   if (typeof window === 'undefined') return null
+  
+  // Randomly select which edge of the screen to spawn from (0=top, 1=right, 2=bottom, 3=left)
   const side = Math.floor(Math.random() * 4)
   const { innerWidth, innerHeight } = window
   const offsetX = Math.random() * innerWidth
@@ -299,23 +313,25 @@ const createShootingStar = () => {
   let startY = 0
   let angle = 45
 
+  // Set starting position and angle based on spawn side
+  // Angles are in degrees: 45° (top-left), 135° (top-right), 225° (bottom-right), 315° (bottom-left)
   switch (side) {
-    case 0:
+    case 0: // Top edge
       startX = offsetX
       startY = -20
       angle = 45
       break
-    case 1:
+    case 1: // Right edge
       startX = innerWidth + 20
       startY = offsetY
       angle = 135
       break
-    case 2:
+    case 2: // Bottom edge
       startX = offsetX
       startY = innerHeight + 20
       angle = 225
       break
-    case 3:
+    case 3: // Left edge
     default:
       startX = -20
       startY = offsetY
@@ -323,18 +339,19 @@ const createShootingStar = () => {
       break
   }
 
+  // Randomly select color from available shooting star colors
   const color = SHOOTING_STAR_COLORS[Math.floor(Math.random() * SHOOTING_STAR_COLORS.length)]
 
   return {
-    id: `${Date.now()}-${Math.random()}`,
+    id: `${Date.now()}-${Math.random()}`, // Unique ID for React key
     x: startX,
     y: startY,
-    angle,
+    angle, // Direction of travel in degrees
     speed: SHOOTING_STAR_MIN_SPEED + Math.random() * (SHOOTING_STAR_MAX_SPEED - SHOOTING_STAR_MIN_SPEED),
-    distance: 0,
-    scale: 1,
+    distance: 0, // Track total distance traveled for scale effect
+    scale: 1, // Scale increases with distance for perspective effect
     color,
-    tailLength: 30 + Math.random() * 20
+    tailLength: 30 + Math.random() * 20 // Tail length in pixels (30-50px range)
   }
 }
 
@@ -343,17 +360,21 @@ const ShootingStarsLayer = () => {
   const spawnTimeout = useRef(null)
   const animationFrame = useRef(null)
 
+  // Spawn shooting stars at random intervals
+  // Uses recursive setTimeout to continuously spawn new stars while maintaining max count
   useEffect(() => {
     if (typeof window === 'undefined') return
 
     const scheduleSpawn = () => {
       spawnTimeout.current = window.setTimeout(() => {
         setStars(prev => {
+          // Don't spawn if we've reached the maximum number of shooting stars
           if (prev.length >= MAX_SHOOTING_STARS) return prev
           const next = createShootingStar()
           if (!next) return prev
           return [...prev, next]
         })
+        // Schedule next spawn - recursive pattern ensures continuous spawning
         scheduleSpawn()
       }, SHOOTING_STAR_MIN_DELAY + Math.random() * (SHOOTING_STAR_MAX_DELAY - SHOOTING_STAR_MIN_DELAY))
     }
@@ -368,6 +389,8 @@ const ShootingStarsLayer = () => {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
+    // Animation loop for shooting stars - continues smoothly during scroll
+    // Using requestAnimationFrame ensures it runs at optimal frame rate
     const animate = () => {
       setStars(prev =>
         prev
@@ -378,6 +401,7 @@ const ShootingStarsLayer = () => {
             const distance = star.distance + star.speed
             const scale = 1 + distance / 600
 
+            // Remove stars that have moved off-screen
             if (
               newX < -80 ||
               newX > window.innerWidth + 80 ||
@@ -394,6 +418,7 @@ const ShootingStarsLayer = () => {
       animationFrame.current = requestAnimationFrame(animate)
     }
 
+    // Start animation loop - this continues even during scroll events
     animationFrame.current = requestAnimationFrame(animate)
 
     return () => {
@@ -473,24 +498,20 @@ const GlassCard = ({ children, className = '' }) => (
 )
 
 const OrbitBackdrop = () => {
+  // Use useScroll directly without useSpring for better performance during scroll
+  // useSpring was causing lag by trying to smooth already-smooth scroll events
   const { scrollYProgress } = useScroll()
   
-  // Use useSpring for smooth, lag-free planet movement with optimized settings
-  const smoothScroll = useSpring(scrollYProgress, { 
-    stiffness: 150, 
-    damping: 40,
-    mass: 0.3
-  })
+  // Direct transforms are GPU-accelerated and don't block during scroll
+  const starOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.5, 1, 0.7])
+  const auroraOffsetY = useTransform(scrollYProgress, [0, 1], [0, -260])
+  const auroraOpacity = useTransform(scrollYProgress, [0, 0.3, 1], [0.9, 0.7, 0.4])
   
-  const starOpacity = useTransform(smoothScroll, [0, 0.5, 1], [0.5, 1, 0.7])
-  const auroraOffsetY = useTransform(smoothScroll, [0, 1], [0, -260])
-  const auroraOpacity = useTransform(smoothScroll, [0, 0.3, 1], [0.9, 0.7, 0.4])
-  
-  // Smooth planet transforms - position only, no rotation
+  // Planet transforms - using direct transforms for smooth, lag-free movement
   const planetTransforms = PLANETS.map(planet => ({
     ...planet,
-    x: useTransform(smoothScroll, [0, 1], planet.xRange),
-    y: useTransform(smoothScroll, [0, 1], planet.yRange)
+    x: useTransform(scrollYProgress, [0, 1], planet.xRange),
+    y: useTransform(scrollYProgress, [0, 1], planet.yRange)
   }))
   
   return (
