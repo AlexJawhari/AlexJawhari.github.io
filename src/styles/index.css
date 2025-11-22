@@ -82,8 +82,8 @@
   backface-visibility: hidden;
   /* Use CSS custom property for initial rotation, then animate from there */
   animation: orbitSpin var(--orbit-duration, 24s) linear infinite;
-  /* Initial rotation set via CSS variable */
-  transform: rotate(var(--orbit-initial-rotation, 0deg)) translateZ(0);
+  /* Initial transform - animation will override this */
+  transform: translateZ(0);
 }
 
 /* Orbit rings - positioned normally, centered via transform-origin */
