@@ -221,7 +221,7 @@ const DEFAULT_STAR_COLOR = '#D5D7D7'
 
 const SHOOTING_STAR_COLORS = [
   { head: 'rgba(213, 215, 215, 0.9)', tail: 'rgba(213, 215, 215, 0.45)', rgb: '213, 215, 215' },
-  { head: 'rgba(18, 46, 64, 0.9)', tail: 'rgba(18, 46, 64, 0.45)', rgb: '18, 46, 64' }
+  { head: 'rgba(100, 180, 255, 0.9)', tail: 'rgba(100, 180, 255, 0.45)', rgb: '100, 180, 255' }
 ]
 
 const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
@@ -244,7 +244,8 @@ const STARS = Array.from({ length: STAR_COUNT }).map((_, idx) => {
   })
 
   const palettePick = () => STAR_PALETTE[Math.floor(Math.random() * STAR_PALETTE.length)]
-  const colorSequence = [DEFAULT_STAR_COLOR, palettePick(), palettePick()]
+  // Create a sequence that cycles through all palette colors randomly
+  const colorSequence = Array.from({ length: 5 }, () => palettePick())
 
   return {
     id: idx,
@@ -285,8 +286,8 @@ const PLANETS = [
 const MAX_SHOOTING_STARS = 3
 const SHOOTING_STAR_MIN_SPEED = 0.8
 const SHOOTING_STAR_MAX_SPEED = 1.6
-const SHOOTING_STAR_MIN_DELAY = 1600
-const SHOOTING_STAR_MAX_DELAY = 3200
+const SHOOTING_STAR_MIN_DELAY = 2800
+const SHOOTING_STAR_MAX_DELAY = 5500
 
 const createShootingStar = () => {
   if (typeof window === 'undefined') return null
@@ -333,7 +334,7 @@ const createShootingStar = () => {
     distance: 0,
     scale: 1,
     color,
-    tailLength: 25 + Math.random() * 25
+    tailLength: 30 + Math.random() * 20
   }
 }
 
@@ -482,7 +483,6 @@ const OrbitBackdrop = () => {
   })
   
   const starOpacity = useTransform(smoothScroll, [0, 0.5, 1], [0.5, 1, 0.7])
-  const orbitRotation = useTransform(smoothScroll, [0, 1], [0, 35])
   const auroraOffsetY = useTransform(smoothScroll, [0, 1], [0, -260])
   const auroraOpacity = useTransform(smoothScroll, [0, 0.3, 1], [0.9, 0.7, 0.4])
   
@@ -511,6 +511,7 @@ const OrbitBackdrop = () => {
           style['--star-color-1'] = star.colors[0]
           style['--star-color-2'] = star.colors[1]
           style['--star-color-3'] = star.colors[2]
+          style['--star-color-4'] = star.colors[3]
           style['--star-twinkle-duration'] = `${star.twinkleDuration}s`
 
           return (
@@ -523,11 +524,11 @@ const OrbitBackdrop = () => {
         })}
         <ShootingStarsLayer />
       </div>
-      <motion.div className="absolute inset-0" style={{ rotate: orbitRotation }}>
+      <div className="absolute inset-0">
         {[...Array(6)].map((_, idx) => (
           <span key={idx} className={`orbit orbit-${idx + 1}`} />
         ))}
-      </motion.div>
+      </div>
       <div className="absolute inset-0" style={{ zIndex: 10 }}>
         {planetTransforms.map(planet => (
           <motion.span

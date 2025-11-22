@@ -63,12 +63,12 @@
   will-change: transform;
 }
 
-.orbit-1 { width: 60%; height: 40%; top: 10%; left: 20%; }
-.orbit-2 { width: 45%; height: 60%; top: 20%; left: 40%; animation-duration: 30s; }
-.orbit-3 { width: 80%; height: 70%; top: 12%; left: 5%; animation-duration: 26s; }
-.orbit-4 { width: 55%; height: 40%; top: 30%; left: 30%; animation-duration: 32s; }
-.orbit-5 { width: 65%; height: 50%; top: 15%; left: 15%; animation-duration: 36s; }
-.orbit-6 { width: 70%; height: 60%; top: 5%; left: 20%; animation-duration: 40s; }
+.orbit-1 { width: 40%; height: 28%; top: 10%; left: 20%; }
+.orbit-2 { width: 30%; height: 42%; top: 20%; left: 40%; animation-duration: 30s; }
+.orbit-3 { width: 50%; height: 45%; top: 12%; left: 5%; animation-duration: 26s; }
+.orbit-4 { width: 38%; height: 28%; top: 30%; left: 30%; animation-duration: 32s; }
+.orbit-5 { width: 42%; height: 35%; top: 15%; left: 15%; animation-duration: 36s; }
+.orbit-6 { width: 45%; height: 40%; top: 5%; left: 20%; animation-duration: 40s; }
 
 @keyframes orbitSpin {
   from {
@@ -124,17 +124,23 @@
     background: var(--star-color-1, #d5d7d7);
     box-shadow: 0 0 8px var(--star-color-1, #d5d7d7);
   }
-  33% {
+  25% {
+    opacity: 0.5;
+    transform: scale(1.15);
+    background: var(--star-color-2, #e2a128);
+    box-shadow: 0 0 9px var(--star-color-2, #e2a128);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.3);
+    background: var(--star-color-3, #122e40);
+    box-shadow: 0 0 12px var(--star-color-3, #122e40);
+  }
+  75% {
     opacity: 0.6;
     transform: scale(1.2);
-    background: var(--star-color-2, #e2a128);
-    box-shadow: 0 0 10px var(--star-color-2, #e2a128);
-  }
-  66% {
-    opacity: 0.9;
-    transform: scale(1.35);
-    background: var(--star-color-3, #122e40);
-    box-shadow: 0 0 14px var(--star-color-3, #122e40);
+    background: var(--star-color-4, #283121);
+    box-shadow: 0 0 10px var(--star-color-4, #283121);
   }
 }
 
