@@ -1,18 +1,47 @@
+# Dependencies
 node_modules/
 dist/
+
+# OS files
 .DS_Store
-*.log
-*.tmp
+Thumbs.db
 *.swp
 *.swo
+
+# Logs and temporary files
+*.log
+*.tmp
 coverage/
+
+# Environment variables and secrets
 .env
 .env.*
-.vite
+.env.local
+.env.production
+*.key
+*.pem
+*.p12
+secrets.json
+config.json
 
-# Documentation and temporary files
+# Build artifacts
+.vite
+.cache
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-*
+
+# Documentation and temporary files (not for public repo)
 HANDOFF_PROMPT.md
 temp_working.jsx
 *.jsx.bak
+*.md.bak
+
+# Personal/sensitive files
+*.pdf
+!public/resume.pdf
+Alexander_Jawhari_Resume.pdf
 
 

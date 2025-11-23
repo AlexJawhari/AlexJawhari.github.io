@@ -131,6 +131,11 @@
   inset: 0;
   overflow: hidden;
   z-index: 1;
+  /* Force GPU acceleration for entire starfield - prevents animation pausing during scroll */
+  transform: translate3d(0, 0, 0);
+  will-change: contents;
+  /* Ensure animations continue during scroll */
+  contain: layout style paint;
 }
 
 .star {
@@ -160,10 +165,14 @@
   background: var(--star-color-1, #d5d7d7);
   box-shadow: 0 0 8px var(--star-color-1, #d5d7d7);
   animation: twinkleColor var(--star-twinkle-duration, 8s) ease-in-out infinite;
-  /* GPU acceleration for smooth animation during scroll */
+  /* GPU acceleration for smooth animation during scroll - prevents freezing */
   will-change: transform, opacity, background-color;
-  transform: translateZ(0);
+  transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
+  /* Force animation to continue during scroll - prevents browser from pausing */
+  animation-play-state: running !important;
+  /* Create separate compositor layer */
+  isolation: isolate;
 }
 
 @keyframes twinkleColor {

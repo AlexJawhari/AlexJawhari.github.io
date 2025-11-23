@@ -327,21 +327,31 @@ const generateStaticPlanets = () => {
 // Generate planets once on module load
 const STATIC_PLANETS = generateStaticPlanets()
 
+/**
+ * Shooting Star Configuration
+ * Controls spawn frequency and maximum concurrent stars
+ * - Normally: 1 star (65% of spawns)
+ * - 25% chance: 2 stars
+ * - 10% chance: 3 stars
+ */
 const MAX_SHOOTING_STARS = 1 // Normally 1
 const MAX_SHOOTING_STARS_TWO = 2 // 25% chance for 2
 const MAX_SHOOTING_STARS_THREE = 3 // 10% chance for 3
-const SHOOTING_STAR_MIN_SPEED = 0.8
+const SHOOTING_STAR_MIN_SPEED = 0.8 // Pixels per frame (base 60fps)
 const SHOOTING_STAR_MAX_SPEED = 1.6
-const SHOOTING_STAR_MIN_DELAY = 6000 // Increased delays to reduce frequency
-const SHOOTING_STAR_MAX_DELAY = 12000
+const SHOOTING_STAR_MIN_DELAY = 6000 // Minimum spawn delay in milliseconds
+const SHOOTING_STAR_MAX_DELAY = 12000 // Maximum spawn delay in milliseconds
 const SHOOTING_STAR_TWO_CHANCE = 0.25 // 25% chance for 2 stars
 const SHOOTING_STAR_THREE_CHANCE = 0.10 // 10% chance for 3 stars
 
 /**
  * Creates a new shooting star with random properties
- * Shooting stars spawn from random edges of the screen and travel diagonally
+ * 
+ * Shooting stars spawn from random edges of the screen and travel diagonally across.
+ * Uses CSS animations for smooth, constant-speed movement that never lags during scroll.
+ * 
  * @param {Set} existingAngles - Set of angles already in use to ensure variety
- * @returns {Object|null} Shooting star object with position, angle, speed, and color
+ * @returns {Object|null} Shooting star object with start/end positions, angle, duration, and color
  */
 const createShootingStar = (existingAngles = new Set()) => {
   if (typeof window === 'undefined') return null
@@ -441,8 +451,19 @@ const createShootingStar = (existingAngles = new Set()) => {
   }
 }
 
-// Shooting stars layer using direct DOM manipulation to avoid React re-renders
-// This eliminates lag during scroll by completely bypassing React's render cycle
+/**
+ * Shooting Stars Layer Component
+ * 
+ * Uses CSS animations for perfectly smooth, constant-speed movement.
+ * Animations run on the compositor thread, completely independent of JavaScript,
+ * ensuring zero lag even during rapid scrolling.
+ * 
+ * Features:
+ * - CSS keyframe animations for each star (no JavaScript animation loop)
+ * - Automatic cleanup when animations complete
+ * - GPU-accelerated transforms for maximum performance
+ * - Spawn frequency control (normally 1, 25% chance for 2, 10% chance for 3)
+ */
 const ShootingStarsLayer = () => {
   const containerRef = useRef(null)
   const starsRef = useRef(new Map()) // Map of star ID to DOM element
@@ -621,8 +642,19 @@ const GlassCard = ({ children, className = '' }) => (
   </div>
 )
 
-// Optimized background component - completely static to eliminate scroll lag
-// All elements are static or use CSS animations only (no JavaScript scroll updates)
+/**
+ * Scroll-Based Background Component
+ * 
+ * Optimized for maximum performance with zero scroll lag.
+ * All animations use CSS only - no JavaScript scroll event handlers.
+ * 
+ * Features:
+ * - Static stars with CSS twinkling animations (never freeze during scroll)
+ * - CSS-animated shooting stars (smooth constant movement)
+ * - CSS-animated orbit rings (lotus flower pattern when aligned)
+ * - Static planets (random positions/sizes on page load)
+ * - All animations run on compositor thread, independent of main thread
+ */
 const ScrollBasedBackground = () => {
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none">
