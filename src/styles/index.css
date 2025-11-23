@@ -71,56 +71,49 @@
 }
 
 /* Orbit rings - centered in the middle of the viewport, designed to form lotus flower pattern when aligned */
-/* All orbits are perfect circles (same width/height) at different sizes */
+/* Original elliptical sizes restored - only rotation speeds/angles adjusted for lotus pattern */
 /* Initial rotations are set to create a 6-petal lotus pattern when they align */
-/* Rotation speeds are varied but related so they periodically sync into the flower pattern */
 .orbit-1 { 
-  width: 32%; 
-  height: 32%; 
+  width: 40%; 
+  height: 28%; 
   top: 50%; 
   left: 50%; 
   --orbit-duration: 60s;
-  /* Innermost ring - smallest */
 }
 .orbit-2 { 
-  width: 48%; 
-  height: 48%; 
+  width: 30%; 
+  height: 42%; 
   top: 50%; 
   left: 50%; 
   --orbit-duration: 72s;
-  /* Second ring */
 }
 .orbit-3 { 
-  width: 64%; 
-  height: 64%; 
+  width: 50%; 
+  height: 45%; 
   top: 50%; 
   left: 50%; 
   --orbit-duration: 84s;
-  /* Third ring */
 }
 .orbit-4 { 
-  width: 80%; 
-  height: 80%; 
+  width: 38%; 
+  height: 28%; 
   top: 50%; 
   left: 50%; 
   --orbit-duration: 96s;
-  /* Fourth ring - outer */
 }
 .orbit-5 { 
-  width: 40%; 
-  height: 40%; 
+  width: 42%; 
+  height: 35%; 
   top: 50%; 
   left: 50%; 
   --orbit-duration: 66s;
-  /* Fifth ring - medium */
 }
 .orbit-6 { 
-  width: 56%; 
-  height: 56%; 
+  width: 45%; 
+  height: 40%; 
   top: 50%; 
   left: 50%; 
   --orbit-duration: 78s;
-  /* Sixth ring - medium-large */
 }
 
 @keyframes orbitSpin {

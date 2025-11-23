@@ -327,13 +327,15 @@ const generateStaticPlanets = () => {
 // Generate planets once on module load
 const STATIC_PLANETS = generateStaticPlanets()
 
-const MAX_SHOOTING_STARS = 2 // Usually 1-2, rarely 3
-const MAX_SHOOTING_STARS_RARE = 3 // Only allow 3 rarely
+const MAX_SHOOTING_STARS = 1 // Normally 1
+const MAX_SHOOTING_STARS_TWO = 2 // 25% chance for 2
+const MAX_SHOOTING_STARS_THREE = 3 // 10% chance for 3
 const SHOOTING_STAR_MIN_SPEED = 0.8
 const SHOOTING_STAR_MAX_SPEED = 1.6
-const SHOOTING_STAR_MIN_DELAY = 5000 // Increased delays to reduce frequency
-const SHOOTING_STAR_MAX_DELAY = 10000
-const SHOOTING_STAR_RARE_CHANCE = 0.15 // 15% chance to allow 3 stars
+const SHOOTING_STAR_MIN_DELAY = 6000 // Increased delays to reduce frequency
+const SHOOTING_STAR_MAX_DELAY = 12000
+const SHOOTING_STAR_TWO_CHANCE = 0.25 // 25% chance for 2 stars
+const SHOOTING_STAR_THREE_CHANCE = 0.10 // 10% chance for 3 stars
 
 /**
  * Creates a new shooting star with random properties
@@ -414,14 +416,26 @@ const createShootingStar = (existingAngles = new Set()) => {
   // Randomly select color from available shooting star colors
   const color = SHOOTING_STAR_COLORS[Math.floor(Math.random() * SHOOTING_STAR_COLORS.length)]
 
+  // Calculate end position based on angle and screen dimensions
+  // Move far enough to cross the entire screen
+  const maxDistance = Math.sqrt(innerWidth * innerWidth + innerHeight * innerHeight) * 1.5
+  const angleRadians = (angle * Math.PI) / 180
+  const endX = startX + maxDistance * Math.cos(angleRadians)
+  const endY = startY + maxDistance * Math.sin(angleRadians)
+  
+  // Calculate duration based on speed (faster stars = shorter duration)
+  const speed = SHOOTING_STAR_MIN_SPEED + Math.random() * (SHOOTING_STAR_MAX_SPEED - SHOOTING_STAR_MIN_SPEED)
+  // Duration in seconds - adjust based on speed to maintain constant visual speed
+  const duration = maxDistance / (speed * 60) // Convert speed to pixels per second (assuming 60fps base)
+
   return {
     id: `${Date.now()}-${Math.random()}`, // Unique ID for React key
-    x: startX,
-    y: startY,
+    startX,
+    startY,
+    endX,
+    endY,
     angle, // Direction of travel in degrees
-    speed: SHOOTING_STAR_MIN_SPEED + Math.random() * (SHOOTING_STAR_MAX_SPEED - SHOOTING_STAR_MIN_SPEED),
-    distance: 0, // Track total distance traveled for scale effect
-    scale: 1, // Scale increases with distance for perspective effect
+    duration, // Animation duration in seconds
     color,
     tailLength: 30 + Math.random() * 20 // Tail length in pixels (30-50px range)
   }
@@ -433,7 +447,6 @@ const ShootingStarsLayer = () => {
   const containerRef = useRef(null)
   const starsRef = useRef(new Map()) // Map of star ID to DOM element
   const spawnTimeout = useRef(null)
-  const animationFrame = useRef(null)
 
   // Spawn shooting stars at random intervals using direct DOM manipulation
   useEffect(() => {
@@ -441,12 +454,16 @@ const ShootingStarsLayer = () => {
 
     const scheduleSpawn = () => {
       spawnTimeout.current = window.setTimeout(() => {
-        // Determine max stars: usually 2, rarely 3
         const currentCount = starsRef.current.size
-        const allowThree = Math.random() < SHOOTING_STAR_RARE_CHANCE
-        const maxStars = (allowThree && currentCount < MAX_SHOOTING_STARS_RARE) 
-          ? MAX_SHOOTING_STARS_RARE 
-          : MAX_SHOOTING_STARS
+        
+        // Determine max stars: normally 1, 25% chance for 2, 10% chance for 3
+        const rand = Math.random()
+        let maxStars = MAX_SHOOTING_STARS
+        if (rand < SHOOTING_STAR_THREE_CHANCE) {
+          maxStars = MAX_SHOOTING_STARS_THREE
+        } else if (rand < SHOOTING_STAR_THREE_CHANCE + SHOOTING_STAR_TWO_CHANCE) {
+          maxStars = MAX_SHOOTING_STARS_TWO
+        }
         
         // Don't spawn if we've reached the maximum number of shooting stars
         if (currentCount >= maxStars) {
@@ -470,6 +487,41 @@ const ShootingStarsLayer = () => {
         const container = document.createElement('div')
         container.className = 'comet-container'
         container.dataset.starId = star.id
+        
+        // Create unique animation name for this star
+        const animationName = `shoot-${star.id.replace(/[^a-zA-Z0-9]/g, '')}`
+        
+        // Create CSS keyframes for smooth constant movement
+        // Use a dedicated style element for shooting star animations
+        let styleElement = document.getElementById('shooting-star-styles')
+        if (!styleElement) {
+          styleElement = document.createElement('style')
+          styleElement.id = 'shooting-star-styles'
+          document.head.appendChild(styleElement)
+        }
+        const styleSheet = styleElement.sheet
+        
+        const keyframes = `
+          @keyframes ${animationName} {
+            from {
+              transform: translate3d(${star.startX}px, ${star.startY}px, 0) rotate(${star.angle}deg) scale(1);
+            }
+            to {
+              transform: translate3d(${star.endX}px, ${star.endY}px, 0) rotate(${star.angle}deg) scale(1.5);
+            }
+          }
+        `
+        try {
+          styleSheet.insertRule(keyframes, styleSheet.cssRules.length)
+        } catch (e) {
+          // Fallback: append to style element directly
+          styleElement.textContent += keyframes
+        }
+        
+        // Apply animation
+        container.style.animation = `${animationName} ${star.duration}s linear forwards`
+        container.style.willChange = 'transform'
+        container.style.transform = `translate3d(${star.startX}px, ${star.startY}px, 0)`
 
         const tail = document.createElement('div')
         tail.className = 'comet-tail'
@@ -495,8 +547,30 @@ const ShootingStarsLayer = () => {
         container.appendChild(head)
         containerRef.current.appendChild(container)
 
-        // Store star data and DOM element
-        starsRef.current.set(star.id, { ...star, element: container })
+        // Store star data and DOM element for cleanup
+        starsRef.current.set(star.id, { 
+          ...star, 
+          element: container,
+          animationName,
+          styleSheet,
+          keyframeIndex: styleSheet.cssRules.length - 1
+        })
+        
+        // Remove star after animation completes
+        container.addEventListener('animationend', () => {
+          if (container.parentNode) {
+            container.parentNode.removeChild(container)
+          }
+          // Clean up CSS keyframes
+          try {
+            if (styleSheet.cssRules[starsRef.current.get(star.id)?.keyframeIndex]) {
+              styleSheet.deleteRule(starsRef.current.get(star.id)?.keyframeIndex)
+            }
+          } catch (e) {
+            // Keyframe may have already been removed
+          }
+          starsRef.current.delete(star.id)
+        })
 
         scheduleSpawn()
       }, SHOOTING_STAR_MIN_DELAY + Math.random() * (SHOOTING_STAR_MAX_DELAY - SHOOTING_STAR_MIN_DELAY))
@@ -509,68 +583,9 @@ const ShootingStarsLayer = () => {
     }
   }, [])
 
-  // Animation loop using delta-time approach - smooth animation that compensates for frame rate variations
-  // Tracks last frame time and uses delta to maintain constant speed regardless of frame rate
-  useEffect(() => {
-    if (typeof window === 'undefined' || !containerRef.current) return
-
-    let lastTime = performance.now()
-    const targetFPS = 60
-    const frameTime = 1000 / targetFPS
-
-    const animate = (currentTime) => {
-      // Calculate delta time in milliseconds
-      const deltaTime = currentTime - lastTime
-      lastTime = currentTime
-      
-      // Normalize delta to target frame rate (prevents speed variations)
-      const normalizedDelta = deltaTime / frameTime
-      const radians = Math.PI / 180
-      
-      starsRef.current.forEach((star, id) => {
-        const angleRadians = star.angle * radians
-        // Move based on normalized delta to maintain constant speed
-        const moveDistance = star.speed * normalizedDelta
-        const newX = star.x + moveDistance * Math.cos(angleRadians)
-        const newY = star.y + moveDistance * Math.sin(angleRadians)
-        const distance = star.distance + moveDistance
-        const scale = 1 + distance / 600
-
-        // Remove stars that have moved off-screen
-        if (
-          newX < -80 ||
-          newX > window.innerWidth + 80 ||
-          newY < -80 ||
-          newY > window.innerHeight + 80
-        ) {
-          if (star.element && star.element.parentNode) {
-            star.element.parentNode.removeChild(star.element)
-          }
-          starsRef.current.delete(id)
-          return
-        }
-
-        // Update star data
-        star.x = newX
-        star.y = newY
-        star.distance = distance
-        star.scale = scale
-
-        // Update DOM directly with GPU-accelerated transform - no React re-render
-        if (star.element) {
-          star.element.style.transform = `translate3d(${newX}px, ${newY}px, 0) rotate(${star.angle}deg) scale(${scale})`
-        }
-      })
-
-      animationFrame.current = requestAnimationFrame(animate)
-    }
-
-    animationFrame.current = requestAnimationFrame(animate)
-
-    return () => {
-      if (animationFrame.current) cancelAnimationFrame(animationFrame.current)
-    }
-  }, [])
+  // No animation loop needed - CSS animations handle all movement
+  // This provides perfectly smooth, constant-speed animation that never lags
+  // CSS animations run on the compositor thread, completely independent of JavaScript
 
   return <div ref={containerRef} className="absolute inset-0" />
 }
