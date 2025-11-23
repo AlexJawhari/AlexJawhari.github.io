@@ -339,8 +339,8 @@ const MAX_SHOOTING_STARS_TWO = 2 // 25% chance for 2
 const MAX_SHOOTING_STARS_THREE = 3 // 10% chance for 3
 const SHOOTING_STAR_MIN_SPEED = 0.8 // Pixels per frame (base 60fps)
 const SHOOTING_STAR_MAX_SPEED = 1.6
-const SHOOTING_STAR_MIN_DELAY = 6000 // Minimum spawn delay in milliseconds
-const SHOOTING_STAR_MAX_DELAY = 12000 // Maximum spawn delay in milliseconds
+const SHOOTING_STAR_MIN_DELAY = 5000 // Minimum spawn delay in milliseconds (5 seconds)
+const SHOOTING_STAR_MAX_DELAY = 12000 // Maximum spawn delay in milliseconds (12 seconds)
 const SHOOTING_STAR_TWO_CHANCE = 0.25 // 25% chance for 2 stars
 const SHOOTING_STAR_THREE_CHANCE = 0.10 // 10% chance for 3 stars
 
