@@ -381,12 +381,11 @@ const createShootingStar = () => {
 
   return {
     id: `${Date.now()}-${Math.random()}`, // Unique ID for React key
-    x: startX,
-    y: startY,
+    startX, // Store initial position
+    startY,
     angle, // Direction of travel in degrees
     speed: SHOOTING_STAR_MIN_SPEED + Math.random() * (SHOOTING_STAR_MAX_SPEED - SHOOTING_STAR_MIN_SPEED),
-    distance: 0, // Track total distance traveled for scale effect
-    scale: 1, // Scale increases with distance for perspective effect
+    startTime: performance.now(), // Track creation time for time-based animation
     color,
     tailLength: 30 + Math.random() * 20 // Tail length in pixels (30-50px range)
   }
@@ -461,17 +460,28 @@ const ShootingStarsLayer = () => {
     }
   }, [])
 
-  // Animation loop using direct DOM manipulation - completely independent of React
+  // Animation loop using time-based calculations - ensures smooth animation during scroll
+  // Uses performance.now() to calculate positions based on elapsed time, not frame count
+  // This prevents slowdown when requestAnimationFrame is throttled during scroll
   useEffect(() => {
     if (typeof window === 'undefined' || !containerRef.current) return
 
     const animate = () => {
+      const currentTime = performance.now()
+      const radians = Math.PI / 180 // Pre-calculate conversion factor
+      
       starsRef.current.forEach((star, id) => {
-        const radians = (star.angle * Math.PI) / 180
-        const newX = star.x + star.speed * Math.cos(radians)
-        const newY = star.y + star.speed * Math.sin(radians)
-        const distance = star.distance + star.speed
-        const scale = 1 + distance / 600
+        // Calculate elapsed time in milliseconds, convert to seconds
+        const elapsedTime = (currentTime - star.startTime) / 1000
+        // Calculate distance traveled based on time (speed is in pixels per frame, but we need pixels per second)
+        // Convert speed to pixels per second (assuming ~60fps: multiply by 60)
+        const distanceTraveled = star.speed * elapsedTime * 60
+        const angleRadians = star.angle * radians
+        
+        // Calculate new position based on elapsed time and initial position
+        const newX = star.startX + distanceTraveled * Math.cos(angleRadians)
+        const newY = star.startY + distanceTraveled * Math.sin(angleRadians)
+        const scale = 1 + distanceTraveled / 600
 
         // Remove stars that have moved off-screen
         if (
@@ -486,12 +496,6 @@ const ShootingStarsLayer = () => {
           starsRef.current.delete(id)
           return
         }
-
-        // Update star data
-        star.x = newX
-        star.y = newY
-        star.distance = distance
-        star.scale = scale
 
         // Update DOM directly - no React re-render
         if (star.element) {

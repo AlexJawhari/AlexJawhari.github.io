@@ -78,42 +78,42 @@
   height: 28%; 
   top: 50%; 
   left: 50%; 
-  --orbit-duration: 24s;
+  --orbit-duration: 60s;
 }
 .orbit-2 { 
   width: 30%; 
   height: 42%; 
   top: 50%; 
   left: 50%; 
-  --orbit-duration: 30s;
+  --orbit-duration: 85s;
 }
 .orbit-3 { 
   width: 50%; 
   height: 45%; 
   top: 50%; 
   left: 50%; 
-  --orbit-duration: 26s;
+  --orbit-duration: 45s;
 }
 .orbit-4 { 
   width: 38%; 
   height: 28%; 
   top: 50%; 
   left: 50%; 
-  --orbit-duration: 32s;
+  --orbit-duration: 95s;
 }
 .orbit-5 { 
   width: 42%; 
   height: 35%; 
   top: 50%; 
   left: 50%; 
-  --orbit-duration: 36s;
+  --orbit-duration: 70s;
 }
 .orbit-6 { 
   width: 45%; 
   height: 40%; 
   top: 50%; 
   left: 50%; 
-  --orbit-duration: 40s;
+  --orbit-duration: 55s;
 }
 
 @keyframes orbitSpin {
