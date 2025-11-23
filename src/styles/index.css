@@ -70,50 +70,57 @@
   animation: orbitSpin var(--orbit-duration, 24s) linear infinite;
 }
 
-/* Orbit rings - centered in the middle of the viewport */
-/* Each orbit has a random initial rotation set via CSS variable in JS */
-/* Using translate(-50%, -50%) to center the element at 50% 50% */
+/* Orbit rings - centered in the middle of the viewport, designed to form lotus flower pattern when aligned */
+/* All orbits are perfect circles (same width/height) at different sizes */
+/* Initial rotations are set to create a 6-petal lotus pattern when they align */
+/* Rotation speeds are varied but related so they periodically sync into the flower pattern */
 .orbit-1 { 
-  width: 40%; 
-  height: 28%; 
+  width: 32%; 
+  height: 32%; 
   top: 50%; 
   left: 50%; 
   --orbit-duration: 60s;
+  /* Innermost ring - smallest */
 }
 .orbit-2 { 
-  width: 30%; 
-  height: 42%; 
+  width: 48%; 
+  height: 48%; 
   top: 50%; 
   left: 50%; 
-  --orbit-duration: 85s;
+  --orbit-duration: 72s;
+  /* Second ring */
 }
 .orbit-3 { 
-  width: 50%; 
-  height: 45%; 
+  width: 64%; 
+  height: 64%; 
   top: 50%; 
   left: 50%; 
-  --orbit-duration: 45s;
+  --orbit-duration: 84s;
+  /* Third ring */
 }
 .orbit-4 { 
-  width: 38%; 
-  height: 28%; 
+  width: 80%; 
+  height: 80%; 
   top: 50%; 
   left: 50%; 
-  --orbit-duration: 95s;
+  --orbit-duration: 96s;
+  /* Fourth ring - outer */
 }
 .orbit-5 { 
-  width: 42%; 
-  height: 35%; 
-  top: 50%; 
-  left: 50%; 
-  --orbit-duration: 70s;
-}
-.orbit-6 { 
-  width: 45%; 
+  width: 40%; 
   height: 40%; 
   top: 50%; 
   left: 50%; 
-  --orbit-duration: 55s;
+  --orbit-duration: 66s;
+  /* Fifth ring - medium */
+}
+.orbit-6 { 
+  width: 56%; 
+  height: 56%; 
+  top: 50%; 
+  left: 50%; 
+  --orbit-duration: 78s;
+  /* Sixth ring - medium-large */
 }
 
 @keyframes orbitSpin {

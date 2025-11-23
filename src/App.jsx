@@ -327,53 +327,88 @@ const generateStaticPlanets = () => {
 // Generate planets once on module load
 const STATIC_PLANETS = generateStaticPlanets()
 
-const MAX_SHOOTING_STARS = 3
+const MAX_SHOOTING_STARS = 2 // Usually 1-2, rarely 3
+const MAX_SHOOTING_STARS_RARE = 3 // Only allow 3 rarely
 const SHOOTING_STAR_MIN_SPEED = 0.8
 const SHOOTING_STAR_MAX_SPEED = 1.6
-const SHOOTING_STAR_MIN_DELAY = 3000
-const SHOOTING_STAR_MAX_DELAY = 6000
+const SHOOTING_STAR_MIN_DELAY = 5000 // Increased delays to reduce frequency
+const SHOOTING_STAR_MAX_DELAY = 10000
+const SHOOTING_STAR_RARE_CHANCE = 0.15 // 15% chance to allow 3 stars
 
 /**
  * Creates a new shooting star with random properties
  * Shooting stars spawn from random edges of the screen and travel diagonally
+ * @param {Set} existingAngles - Set of angles already in use to ensure variety
  * @returns {Object|null} Shooting star object with position, angle, speed, and color
  */
-const createShootingStar = () => {
+const createShootingStar = (existingAngles = new Set()) => {
   if (typeof window === 'undefined') return null
   
-  // Randomly select which edge of the screen to spawn from (0=top, 1=right, 2=bottom, 3=left)
-  const side = Math.floor(Math.random() * 4)
   const { innerWidth, innerHeight } = window
-  const offsetX = Math.random() * innerWidth
-  const offsetY = Math.random() * innerHeight
+  
+  // Define possible angles with more variety (not just 45° increments)
+  const possibleAngles = [
+    30, 45, 60,  // Top-left quadrant
+    120, 135, 150, // Top-right quadrant
+    210, 225, 240, // Bottom-right quadrant
+    300, 315, 330  // Bottom-left quadrant
+  ]
+  
+  // Filter out angles that are too similar to existing ones (within 20 degrees)
+  const availableAngles = possibleAngles.filter(angle => {
+    return !Array.from(existingAngles).some(existing => {
+      const diff = Math.abs(angle - existing)
+      return diff < 20 || diff > 340 // Account for wrap-around
+    })
+  })
+  
+  // Use available angles or fall back to all angles if none available
+  const angleOptions = availableAngles.length > 0 ? availableAngles : possibleAngles
+  let angle = angleOptions[Math.floor(Math.random() * angleOptions.length)]
+  
+  // Add some randomness to the angle (±5 degrees) for more variety
+  angle += (Math.random() - 0.5) * 10
+  
+  // Determine spawn side based on angle
   let startX = 0
   let startY = 0
-  let angle = 45
-
-  // Set starting position and angle based on spawn side
-  // Angles are in degrees: 45° (top-left), 135° (top-right), 225° (bottom-right), 315° (bottom-left)
-  switch (side) {
-    case 0: // Top edge
-      startX = offsetX
+  
+  if (angle >= 0 && angle < 90) {
+    // Top-left: spawn from top or left
+    if (Math.random() > 0.5) {
+      startX = Math.random() * innerWidth
       startY = -20
-      angle = 45
-      break
-    case 1: // Right edge
-      startX = innerWidth + 20
-      startY = offsetY
-      angle = 135
-      break
-    case 2: // Bottom edge
-      startX = offsetX
-      startY = innerHeight + 20
-      angle = 225
-      break
-    case 3: // Left edge
-    default:
+    } else {
       startX = -20
-      startY = offsetY
-      angle = 315
-      break
+      startY = Math.random() * innerHeight
+    }
+  } else if (angle >= 90 && angle < 180) {
+    // Top-right: spawn from top or right
+    if (Math.random() > 0.5) {
+      startX = Math.random() * innerWidth
+      startY = -20
+    } else {
+      startX = innerWidth + 20
+      startY = Math.random() * innerHeight
+    }
+  } else if (angle >= 180 && angle < 270) {
+    // Bottom-right: spawn from bottom or right
+    if (Math.random() > 0.5) {
+      startX = Math.random() * innerWidth
+      startY = innerHeight + 20
+    } else {
+      startX = innerWidth + 20
+      startY = Math.random() * innerHeight
+    }
+  } else {
+    // Bottom-left: spawn from bottom or left
+    if (Math.random() > 0.5) {
+      startX = Math.random() * innerWidth
+      startY = innerHeight + 20
+    } else {
+      startX = -20
+      startY = Math.random() * innerHeight
+    }
   }
 
   // Randomly select color from available shooting star colors
@@ -381,11 +416,12 @@ const createShootingStar = () => {
 
   return {
     id: `${Date.now()}-${Math.random()}`, // Unique ID for React key
-    startX, // Store initial position
-    startY,
+    x: startX,
+    y: startY,
     angle, // Direction of travel in degrees
     speed: SHOOTING_STAR_MIN_SPEED + Math.random() * (SHOOTING_STAR_MAX_SPEED - SHOOTING_STAR_MIN_SPEED),
-    startTime: performance.now(), // Track creation time for time-based animation
+    distance: 0, // Track total distance traveled for scale effect
+    scale: 1, // Scale increases with distance for perspective effect
     color,
     tailLength: 30 + Math.random() * 20 // Tail length in pixels (30-50px range)
   }
@@ -405,13 +441,26 @@ const ShootingStarsLayer = () => {
 
     const scheduleSpawn = () => {
       spawnTimeout.current = window.setTimeout(() => {
+        // Determine max stars: usually 2, rarely 3
+        const currentCount = starsRef.current.size
+        const allowThree = Math.random() < SHOOTING_STAR_RARE_CHANCE
+        const maxStars = (allowThree && currentCount < MAX_SHOOTING_STARS_RARE) 
+          ? MAX_SHOOTING_STARS_RARE 
+          : MAX_SHOOTING_STARS
+        
         // Don't spawn if we've reached the maximum number of shooting stars
-        if (starsRef.current.size >= MAX_SHOOTING_STARS) {
+        if (currentCount >= maxStars) {
           scheduleSpawn()
           return
         }
 
-        const star = createShootingStar()
+        // Get existing angles to ensure variety
+        const existingAngles = new Set()
+        starsRef.current.forEach(star => {
+          existingAngles.add(Math.round(star.angle / 10) * 10) // Round to nearest 10 degrees
+        })
+
+        const star = createShootingStar(existingAngles)
         if (!star || !containerRef.current) {
           scheduleSpawn()
           return
@@ -460,28 +509,32 @@ const ShootingStarsLayer = () => {
     }
   }, [])
 
-  // Animation loop using time-based calculations - ensures smooth animation during scroll
-  // Uses performance.now() to calculate positions based on elapsed time, not frame count
-  // This prevents slowdown when requestAnimationFrame is throttled during scroll
+  // Animation loop using delta-time approach - smooth animation that compensates for frame rate variations
+  // Tracks last frame time and uses delta to maintain constant speed regardless of frame rate
   useEffect(() => {
     if (typeof window === 'undefined' || !containerRef.current) return
 
-    const animate = () => {
-      const currentTime = performance.now()
-      const radians = Math.PI / 180 // Pre-calculate conversion factor
+    let lastTime = performance.now()
+    const targetFPS = 60
+    const frameTime = 1000 / targetFPS
+
+    const animate = (currentTime) => {
+      // Calculate delta time in milliseconds
+      const deltaTime = currentTime - lastTime
+      lastTime = currentTime
+      
+      // Normalize delta to target frame rate (prevents speed variations)
+      const normalizedDelta = deltaTime / frameTime
+      const radians = Math.PI / 180
       
       starsRef.current.forEach((star, id) => {
-        // Calculate elapsed time in milliseconds, convert to seconds
-        const elapsedTime = (currentTime - star.startTime) / 1000
-        // Calculate distance traveled based on time (speed is in pixels per frame, but we need pixels per second)
-        // Convert speed to pixels per second (assuming ~60fps: multiply by 60)
-        const distanceTraveled = star.speed * elapsedTime * 60
         const angleRadians = star.angle * radians
-        
-        // Calculate new position based on elapsed time and initial position
-        const newX = star.startX + distanceTraveled * Math.cos(angleRadians)
-        const newY = star.startY + distanceTraveled * Math.sin(angleRadians)
-        const scale = 1 + distanceTraveled / 600
+        // Move based on normalized delta to maintain constant speed
+        const moveDistance = star.speed * normalizedDelta
+        const newX = star.x + moveDistance * Math.cos(angleRadians)
+        const newY = star.y + moveDistance * Math.sin(angleRadians)
+        const distance = star.distance + moveDistance
+        const scale = 1 + distance / 600
 
         // Remove stars that have moved off-screen
         if (
@@ -497,9 +550,15 @@ const ShootingStarsLayer = () => {
           return
         }
 
-        // Update DOM directly - no React re-render
+        // Update star data
+        star.x = newX
+        star.y = newY
+        star.distance = distance
+        star.scale = scale
+
+        // Update DOM directly with GPU-accelerated transform - no React re-render
         if (star.element) {
-          star.element.style.transform = `translate(${newX}px, ${newY}px) rotate(${star.angle}deg) scale(${scale})`
+          star.element.style.transform = `translate3d(${newX}px, ${newY}px, 0) rotate(${star.angle}deg) scale(${scale})`
         }
       })
 
@@ -584,10 +643,15 @@ const ScrollBasedBackground = () => {
       </div>
 
       {/* Orbit rings - static rotation, CSS animations only */}
+      {/* Initial rotations set to create lotus flower pattern when aligned */}
+      {/* Each orbit starts at a specific offset angle (0°, 30°, 60°, 90°, 120°, 150°) */}
+      {/* As they rotate at different speeds, they periodically align to form a 6-petal lotus flower */}
       <div className="absolute inset-0">
         {[...Array(6)].map((_, idx) => {
-          // Generate random initial rotation for each orbit (0-360 degrees)
-          const initialRotation = Math.random() * 360
+          // Set initial rotations to create a 6-petal lotus flower pattern
+          // When orbits align at these angles, their overlapping creates the flower shape
+          const flowerAngles = [0, 30, 60, 90, 120, 150]
+          const initialRotation = flowerAngles[idx] || 0
           return (
             <span 
               key={idx} 
