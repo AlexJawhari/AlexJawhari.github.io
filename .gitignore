@@ -34,10 +34,11 @@ config.json
 *.sublime-*
 
 # Documentation and temporary files (not for public repo)
-HANDOFF_PROMPT.md
+docs/
+*.md
+!package.json
 temp_working.jsx
 *.jsx.bak
-*.md.bak
 
 # Personal/sensitive files
 *.pdf
