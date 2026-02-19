@@ -11,12 +11,12 @@ function AboutPage() {
         <SectionTitle eyebrow="About" title="Mission briefing" />
         <div className="space-y-6 text-da-silver/80 leading-relaxed">
           <p>
-            I am a CS junior with backend instincts and debate-forged communication skills. I gravitate toward problems that require rigor, ethics, and operational calm —
-            scraping platforms that must stay invisible, data systems that guard their sources, and interfaces that feel like archival instruments.
+            I am a CS junior at UT Dallas with backend instincts and debate-forged communication skills. I gravitate toward problems that require rigor, ethics, and operational calm —
+            building full-stack systems, RESTful APIs, geospatial platforms, and security scanners. My work spans automation tools that must stay invisible, data systems that guard their sources, and interfaces that feel like archival instruments.
           </p>
           <p>
-            My engineering practice blends research notebooks, bespoke CLI tooling, and a relentless respect for privacy. I would rather craft a precise, explainable tool than chase hype
-            features. Each project is treated as a field study: hypotheses, instrumentation, and reflection.
+            My engineering practice blends research notebooks, bespoke tooling, and a relentless respect for privacy. I would rather craft a precise, explainable tool than chase hype
+            features. Each project is treated as a field study: hypotheses, instrumentation, and reflection. When not coding, I paint, read philosophy, play guitar, climb rocks, and lift weights — each discipline informs the others.
           </p>
         </div>
       </GlassCard>

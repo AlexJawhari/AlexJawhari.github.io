@@ -35,6 +35,11 @@ function ProjectDetail() {
             <a href={project.repo} target="_blank" rel="noreferrer" className="pill-cta">
               View repository
             </a>
+            {project.liveUrl && (
+              <a href={project.liveUrl} target="_blank" rel="noreferrer" className="pill-cta">
+                View live site
+              </a>
+            )}
             <button onClick={() => navigate(-1)} className="pill-ghost">
               Back
             </button>

@@ -6,42 +6,42 @@ export const SITE = {
   name: 'Alexander Jawhari',
   title: 'Backend-leaning Software Engineer',
   summary:
-    'CS junior obsessed with backend systems, discreet automation, and resilient data infrastructure. I mix dark academia aesthetics with pragmatic engineering — building tools that feel handcrafted yet operate like mission control.',
-  focus: 'Systems design · scraping orchestration · data platforms · infra hygiene',
+    'CS junior at UT Dallas building full-stack systems, RESTful APIs, and automation tools. I blend dark academia aesthetics with pragmatic engineering — crafting geospatial platforms, security scanners, and discreet scrapers that operate like mission control.',
+  focus: 'Full stack development · RESTful APIs · web scraping & automation · geospatial systems · security testing · real-time systems',
   location: 'Dallas, TX · Remote friendly',
-  email: 'alexander.placeholder@email.com',
+  email: 'alexjawhari00@gmail.com',
   github: 'https://github.com/AlexJawhari',
   linkedin: 'https://www.linkedin.com/in/alexjawhari',
   resumeUrl: '/resume.pdf'
 }
 
 export const HIGHLIGHT_STATS = [
-  { label: 'Years shipping code', value: '8+' },
-  { label: 'Primary focus', value: 'Automation & backend systems' },
-  { label: 'Current status', value: 'CS junior · backend emphasis' },
+  { label: 'Education', value: 'UT Dallas · B.S. CS · Expected May 2027' },
+  { label: 'Primary focus', value: 'Full stack · APIs · automation · security' },
+  { label: 'Current status', value: 'CS junior · open to Summer 2026 roles' },
   { label: 'Philosophy', value: 'Privacy, precision, poetic rigor' }
 ]
 
 export const CAPABILITIES = [
   {
-    title: 'Backend & Infra',
-    text: 'APIs, services, and schedulers with observability and disaster-avoidance built in.',
-    tags: ['Python', 'Go', 'Node', 'Postgres', 'Redis', 'Docker', 'Kubernetes']
+    title: 'Full Stack & APIs',
+    text: 'RESTful API design, React applications, and geospatial platforms with real-time features and efficient query layers.',
+    tags: ['React', 'Node.js', 'Express', 'Python', 'Flask', 'Supabase', 'PostgreSQL']
   },
   {
     title: 'Automation & Scraping',
-    text: 'Headless fleets with proxy rotation, fingerprinting defenses, and state diffing.',
-    tags: ['Playwright', 'Headless Chrome', 'Proxy orchestration', 'Queue design']
+    text: 'Multi-layered scraping systems with Playwright automation, BeautifulSoup parsing, and TLS masquerading for reliable data collection.',
+    tags: ['Playwright', 'BeautifulSoup', 'Discord.py', 'curl_cffi', 'Rate limiting']
   },
   {
-    title: 'Data Systems',
-    text: 'Event pipelines, compact storage, and query layers for high-signal dashboards.',
-    tags: ['SQLite', 'DuckDB', 'ETL', 'Data modeling']
+    title: 'Security & Real-Time Systems',
+    text: 'OWASP vulnerability scanning, WebSocket monitoring, and security-first architectures with comprehensive reporting.',
+    tags: ['OWASP Top 10', 'Socket.io', 'Security testing', 'JWT', 'Helmet', 'express-validator']
   }
 ]
 
 export const PHILOSOPHY = [
   'Dark academia meets mission control — handcrafted interfaces with orbital motion cues.',
   'Systems should whisper: minimal surface area, graceful degradation, fewer dependencies.',
-  'Privacy-first storytelling. The work is front and center; the person remains deliberately abstract.'
+  'Debate-forged communication meets engineering rigor. When not coding, I paint, read philosophy, play guitar, climb rocks, and lift weights — each discipline informs the others.'
 ]

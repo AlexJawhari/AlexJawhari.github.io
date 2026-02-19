@@ -13,7 +13,7 @@ function Landing() {
       <section className="grid lg:grid-cols-[2fr,1fr] gap-8 items-stretch relative">
         <GlassCard className="p-8 lg:p-12 bg-gradient-to-br from-white/5 to-transparent backdrop-blur-2xl">
           <div className="flex flex-col gap-5">
-            <div className="text-xs tracking-[0.5em] text-da-gold/80 uppercase">Portfolio / 2025</div>
+            <div className="text-xs tracking-[0.5em] text-da-gold/80 uppercase">Portfolio</div>
             <h1 className="text-4xl lg:text-6xl font-heading leading-tight text-da-silver">
               Alexander Jawhari
               <span className="block text-xl lg:text-2xl text-da-gold/80 mt-3">{SITE.title}</span>
@@ -47,11 +47,11 @@ function Landing() {
             </li>
             <li>
               <strong className="text-da-silver">Interests</strong>
-              <p>automation, discreet systems, research infra, debate-informed storytelling</p>
+              <p>painting, reading philosophy, playing guitar, rock climbing, weight lifting</p>
             </li>
             <li>
               <strong className="text-da-silver">Availability</strong>
-              <p>Open to internships / research labs beginning Summer 2026</p>
+              <p>Open to internships / research roles for Summer 2026</p>
             </li>
           </ul>
         </GlassCard>

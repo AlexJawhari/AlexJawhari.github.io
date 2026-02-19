@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { SITE } from '../data/siteData'
 
 function Footer() {
@@ -8,4 +9,4 @@ function Footer() {
   )
 }
 
-export default Footer
+export default memo(Footer)

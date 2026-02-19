@@ -1,3 +1,5 @@
+import { memo } from 'react'
+
 const SectionTitle = ({ eyebrow, title, description }) => (
   <div className="flex flex-col gap-2 mb-8">
     {eyebrow && <span className="text-xs uppercase tracking-[0.3em] text-da-gold/80">{eyebrow}</span>}
@@ -6,4 +8,4 @@ const SectionTitle = ({ eyebrow, title, description }) => (
   </div>
 )
 
-export default SectionTitle
+export default memo(SectionTitle)

@@ -4,129 +4,87 @@
 
 export const PROJECTS = [
   {
-    slug: 'orion-availability-beacon',
-    title: 'Orion Availability Beacon',
+    slug: 'coursesync',
+    title: 'CourseSync',
     tagline: 'Class scheduling oracle',
     summary:
-      'Full-stack monitor that scrapes institutional course data, deduplicates anomalies, and emits discreet alerts the second a seat opens.',
+      'Discord bot tracking 1,800+ class sections with instant DM notifications when seats open. Multi-layered scraping ensures 100% reliability even against CAPTCHA protection.',
     narrative:
-      'Built a resilient scraping mesh with rotating fingerprints, persisted historical deltas, and routed notifications to email/Discord. Designed a daylight dashboard plus a nocturnal CLI for fast triage.',
+      'Engineered a resilient scraping mesh with Playwright automation, BeautifulSoup token extraction, and curl_cffi TLS masquerading as an automatic fallback chain. Intelligent rate limiting prevents notification spam while maintaining sub-100ms Supabase query times. Deployed containerized on Render with background task loops checking availability every 15 minutes.',
     category: 'featured',
     timeline: '2025',
-    status: 'Live pilot',
-    stack: ['Python', 'Playwright', 'SQLite', 'Docker'],
+    status: 'Live',
+    stack: ['Python', 'Discord.py', 'Playwright', 'BeautifulSoup', 'Supabase', 'Docker', 'Render'],
     highlights: [
-      'Sub-5s detection loop with parallelized scrapers',
-      'State machine prevents duplicate pings while preserving audit trail',
-      'Self-healing workers auto rehydrate when blocked'
+      'Multi-layered scraping with automatic fallback bypasses CAPTCHA with 100% reliability',
+      'Intelligent rate limiting prevents notification spam while maintaining instant alerts',
+      'Sub-100ms Supabase queries with background task loops checking every 15 minutes'
     ],
-    repo: 'https://github.com/AlexJawhari',
-    notion: null,
+    repo: 'https://github.com/AlexJawhari/Class-Availability-Tracker',
+    liveUrl: null,
     heroColor: '#2a375f'
   },
   {
-    slug: 'kyoto-observatory-console',
-    title: 'Kyoto Observatory Console',
-    tagline: 'Dark academia monitoring wall',
+    slug: 'spotfinder',
+    title: 'SpotFinder',
+    tagline: 'Geolocation platform for third spaces',
     summary:
-      'A command-console style dashboard that watches background jobs, scrapers, and queues — rendered like an old observatory terminal with modern telemetry under the hood.',
+      'Full-stack geolocation platform connecting people with third spaces using React concurrent features and Leaflet geospatial clustering to render thousands of locations with real-time check-ins.',
     narrative:
-      'Blends a low-noise, high-signal console UI with structured logs and anomaly pings. Inspired by observatories and old reading rooms: every event feels like a field note, not a notification storm.',
+      'Built a RESTful API with Express handling 98.5% uptime through automated health checks, supporting real-time filtering by amenities with debounced state management. Implemented efficient geospatial queries using PostgreSQL\'s built-in functions to calculate distances, achieving sub-100ms response times for nearby location searches within customizable radius.',
     category: 'featured',
-    timeline: '2024',
-    status: 'Studio build',
-    stack: ['TypeScript', 'React', 'WebSockets', 'Postgres'],
+    timeline: '2025',
+    status: 'Live',
+    stack: ['React', 'Vite', 'Zustand', 'Leaflet.js', 'Node.js', 'Express', 'Supabase', 'Render', 'Vercel', 'Cloudinary'],
     highlights: [
-      'Signal-first log stream with semantic grouping',
-      'Room-inspired themes (library, observatory, midnight lab)',
-      'Keyboard-driven navigation for fast triage'
+      'Geospatial clustering renders thousands of locations smoothly with Leaflet.js',
+      'Sub-100ms response times for nearby location searches using PostgreSQL geospatial functions',
+      'Real-time check-ins and filtering with debounced state management for optimal performance'
     ],
-    repo: 'https://github.com/AlexJawhari',
-    notion: null,
+    repo: 'https://github.com/AlexJawhari/SpotFinder',
+    liveUrl: 'https://spotfinder-fawn.vercel.app/',
     heroColor: '#1b2738'
   },
   {
-    slug: 'ink-and-orbit-notes',
-    title: 'Ink & Orbit Notes',
-    tagline: 'Philosophical engineering notebook',
+    slug: 'devhub',
+    title: 'DevHub',
+    tagline: 'API security & monitoring platform',
     summary:
-      'A note system for stitching together research, experiments, and philosophical questions about systems — part digital commonplace book, part lab log.',
+      'Comprehensive API security platform performing automated OWASP Top 10 scans detecting SQL injection, XSS, and security header misconfigurations across 200+ endpoints with 94% accuracy.',
     narrative:
-      'Organizes ideas as constellations: each experiment, quote, or system sketch links into a graph you can traverse like a star map. Built to keep both technical detail and why-it-matters in the same frame.',
+      'Engineered 24/7 monitoring using node-cron for health checks every 5 minutes, tracking uptime and response times with real-time WebSocket alerts via Socket.io. Built reporting engine generating PDF and JSON security audits with express-validator sanitization, SSRF protection, and rate limiting preventing DDoS attempts.',
     category: 'featured',
-    timeline: '2023 – ongoing',
-    status: 'Personal tool',
-    stack: ['Next.js', 'SQLite', 'MDX'],
+    timeline: '2025',
+    status: 'Live',
+    stack: ['React', 'Vite', 'Tailwind CSS v4', 'Zustand', 'Socket.io', 'Node.js', 'Express', 'Supabase', 'Render', 'Vercel'],
     highlights: [
-      'Bidirectional links between experiments and essays',
-      'Night-mode reading room theme with marginalia',
-      'Lightweight sync so it works offline first'
+      'Automated OWASP Top 10 scans across 200+ endpoints with 94% accuracy',
+      '24/7 monitoring with health checks every 5 minutes and real-time WebSocket alerts',
+      'Comprehensive PDF and JSON security reports with SSRF protection and rate limiting'
     ],
-    repo: 'https://github.com/AlexJawhari',
-    notion: null,
+    repo: 'https://github.com/AlexJawhari/DevHub',
+    liveUrl: 'https://devhub-steel.vercel.app/',
     heroColor: '#262534'
   },
   {
-    slug: 'senate-lattice',
-    title: 'Senate Lattice',
-    tagline: 'Public trading intelligence',
+    slug: 'archive-catalogue',
+    title: 'Archive Catalogue',
+    tagline: 'Library catalogue & lending system',
     summary:
-      'Pipeline that ingests congressional trade disclosures, normalizes filings, and surfaces unusual clusters via a canvas console.',
+      'Full-stack library management system normalizing tens of thousands of lines of data to create a comprehensive catalogue, with dashboards for librarians and users to manage checkouts, searches, and fines.',
     narrative:
-      'Pairs a Go ingestion service with DuckDB-backed analysis and a React command palette UI. Focus on traceability and fairness: every insight links back to raw filings.',
-    category: 'systems',
+      'Designed and normalized complex relational database schemas from raw CSV data spanning tens of thousands of records. Built dual-purpose dashboards: librarian interface for comprehensive system management and user interface for book discovery, checkout/check-in, and fine payment. Implemented automated fine calculation, search functionality across multiple fields, and secure transaction handling.',
+    category: 'featured',
     timeline: '2024',
-    status: 'Research prototype',
-    stack: ['Go', 'DuckDB', 'Redis', 'React'],
+    status: 'Academic project',
+    stack: ['Python', 'Flask', 'SQLite', 'HTML', 'CSS', 'JavaScript'],
     highlights: [
-      'Message queue fan-out keeps parsing deterministic',
-      'Vector similarity pinpoints repeat collaborators',
-      'One-click export to CSV / notebook bundles'
+      'Normalized tens of thousands of lines of raw data into efficient relational schema',
+      'Dual dashboards: comprehensive librarian management and intuitive user experience',
+      'Automated fine calculation, multi-field search, and secure transaction processing'
     ],
-    repo: 'https://github.com/AlexJawhari',
-    notion: null,
+    repo: 'https://github.com/AlexJawhari/SQL-Library-Project',
+    liveUrl: null,
     heroColor: '#0d3b2f'
-  },
-  {
-    slug: 'nocturne-scraper-lab',
-    title: 'Nocturne Scraper Lab',
-    tagline: 'Headless automation playground',
-    summary:
-      'A configurable lab for testing scraper strategies against hostile surfaces — sandboxing browser fingerprints, proxies, and pacing rules.',
-    narrative:
-      'Ships with a pattern library of anti-detection tactics, a declarative job DSL, and telemetry overlays to compare approaches. Think wind tunnel but for scraping.',
-    category: 'experiments',
-    timeline: '2024',
-    status: 'Active build',
-    stack: ['Node', 'TypeScript', 'Redis', 'Kubernetes'],
-    highlights: [
-      'Job composer expresses flows as poetic YAML',
-      'Circuit breakers watch for ban heuristics',
-      'Replayable sessions for postmortems'
-    ],
-    repo: 'https://github.com/AlexJawhari',
-    notion: null,
-    heroColor: '#2b1a3a'
-  },
-  {
-    slug: 'starlit-edge-db',
-    title: 'Starlit Edge DB',
-    tagline: 'Micro database for field kits',
-    summary:
-      'A compact storage engine for edge analytics experiments. Focused on deterministic writes, WAL clarity, and WebAssembly portability.',
-    narrative:
-      'Explores log-structured persistence, snapshotting, and compile-to-WASM interfaces so the same core can run inside browsers or CLIs.',
-    category: 'research',
-    timeline: '2023',
-    status: 'In discovery',
-    stack: ['Rust', 'WebAssembly'],
-    highlights: [
-      'Binary format designed for diff-friendly commits',
-      'Time-travel queries baked into the core',
-      'Focus on zero-config deployment'
-    ],
-    repo: 'https://github.com/AlexJawhari',
-    notion: null,
-    heroColor: '#1f2437'
   }
 ]

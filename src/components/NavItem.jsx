@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { NavLink } from 'react-router-dom'
 
 const NavItem = ({ to, label }) => (
@@ -14,4 +15,4 @@ const NavItem = ({ to, label }) => (
   </NavLink>
 )
 
-export default NavItem
+export default memo(NavItem)
