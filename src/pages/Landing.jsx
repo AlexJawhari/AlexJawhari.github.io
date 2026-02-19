@@ -46,12 +46,16 @@ function Landing() {
               <p>{SITE.location}</p>
             </li>
             <li>
-              <strong className="text-da-silver">Interests</strong>
-              <p>Painting, reading philosophy, playing guitar, rock climbing, and weight lifting</p>
-            </li>
-            <li>
               <strong className="text-da-silver">Availability</strong>
               <p>Open to internships / research roles for Summer 2026</p>
+            </li>
+            <li>
+              <strong className="text-da-silver">Email</strong>
+              <p>{SITE.email}</p>
+            </li>
+            <li>
+              <strong className="text-da-silver">Interests</strong>
+              <p>Painting, reading philosophy, playing guitar, rock climbing, and weight lifting</p>
             </li>
           </ul>
         </GlassCard>
@@ -60,6 +64,7 @@ function Landing() {
       <section className="grid lg:grid-cols-3 gap-6">
         {CAPABILITIES.map(capability => (
           <GlassCard key={capability.title} className="relative overflow-hidden">
+            <div className="text-xs uppercase tracking-[0.3em] text-da-gold/80 mb-2">{capability.eyebrow || 'Capability'}</div>
             <h3 className="text-xl font-heading text-da-silver mb-3">{capability.title}</h3>
             <p className="text-sm text-da-silver/80 mb-5">{capability.text}</p>
             <div className="flex flex-wrap gap-2">
@@ -80,6 +85,7 @@ function Landing() {
             <Link key={project.slug} to={`/projects/${project.slug}`}>
               <GlassCard className="project-card relative">
                 <div className="relative z-10">
+                  <div className="text-xs uppercase tracking-[0.3em] text-da-gold/80 mb-2">{project.tagline}</div>
                   <div className="flex items-center justify-end text-xs uppercase tracking-[0.3em] text-da-silver/60 mb-3">
                     <span>{project.status}</span>
                   </div>

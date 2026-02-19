@@ -64,7 +64,7 @@ export const ABOUT_CARDS = [
     subtitle: 'Cybersecurity Club',
     details: [
       'Member',
-      'Security and privacy practices'
+      'CTF challenges, assembly reverse engineering, and security research'
     ]
   },
   {

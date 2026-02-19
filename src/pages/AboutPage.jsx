@@ -11,7 +11,7 @@ function AboutPage() {
         <SectionTitle eyebrow="About" title="Mission briefing" />
         <div className="space-y-6 text-da-silver/80 leading-relaxed">
           <p>
-            I study computer science at UT Dallas (expected graduation May 2027) with a focus on backend systems and full-stack development. I gravitate toward problems that require rigor, ethics, and operational calm: building RESTful APIs, geospatial platforms, security scanners, and automation tools that stay invisible when they need to.
+            I study computer science at UT Dallas — expected graduation May 2027 — with a focus on backend systems and full-stack development. I gravitate toward problems that require rigor, ethics, and operational calm: building RESTful APIs, geospatial platforms, security scanners, and automation tools that stay invisible when they need to. My work spans from designing resilient data infrastructure to crafting interfaces that feel like archival instruments.
           </p>
           <p>
             My engineering practice blends research notebooks, bespoke tooling, and a strong respect for privacy. I would rather craft a precise, explainable tool than chase hype. Each project is treated as a field study: hypotheses, instrumentation, and reflection. When not coding, I paint, read philosophy, play guitar, climb rocks, and lift weights. Each discipline informs the others.
