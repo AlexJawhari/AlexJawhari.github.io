@@ -4,7 +4,7 @@
 
 export const SITE = {
   name: 'Alexander Jawhari',
-  title: 'Backend-leaning Software Engineer',
+  title: 'Software Engineer',
   summary:
     'Computer science at UT Dallas — expected May 2027. I build full-stack systems, RESTful APIs, and automation tools. Geospatial platforms, security scanners, and scrapers that operate like mission control.',
   focus: 'Full Stack Development · RESTful APIs · Web Scraping & Automation · Geospatial Systems · Security Testing · Real-Time Systems',
