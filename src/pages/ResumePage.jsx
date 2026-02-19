@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { SECTION_VARIANTS } from '../config/animationConfig'
 import { SITE } from '../data/siteData'
@@ -7,7 +7,6 @@ import SectionTitle from '../components/SectionTitle'
 
 function ResumePage() {
   const [loadIframe, setLoadIframe] = useState(false)
-  const containerRef = useRef(null)
 
   useEffect(() => {
     // Lazy load iframe when component mounts (user is already on the page)
@@ -23,7 +22,7 @@ function ResumePage() {
       <GlassCard>
         <SectionTitle eyebrow="Resume" title="PDF dossier" />
         <p className="text-da-silver/70 text-sm max-w-2xl mb-4">
-          View or download the full PDF. Replace <code>public/resume.pdf</code> with updated versions at any time; GitHub Pages will serve it instantly.
+          View or download the full PDF.
         </p>
         <div className="flex flex-wrap gap-3">
           <a href={SITE.resumeUrl} target="_blank" rel="noreferrer" className="pill-cta">
@@ -34,7 +33,7 @@ function ResumePage() {
           </a>
         </div>
       </GlassCard>
-      <GlassCard className="min-h-[90vh]" ref={containerRef}>
+      <GlassCard className="min-h-[90vh]">
         {loadIframe ? (
           <iframe title="Resume PDF" src={SITE.resumeUrl} className="w-full h-[90vh] rounded-2xl border border-white/5" />
         ) : (

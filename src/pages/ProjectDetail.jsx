@@ -25,8 +25,7 @@ function ProjectDetail() {
       <GlassCard className="relative overflow-hidden">
         <div className="absolute inset-0 opacity-20 blur-3xl" style={{ background: project.heroColor }} />
         <div className="relative">
-          <div className="text-xs uppercase tracking-[0.3em] text-da-silver/60 flex justify-between mb-4">
-            <span>{project.timeline}</span>
+          <div className="text-xs uppercase tracking-[0.3em] text-da-silver/60 flex justify-end mb-4">
             <span>{project.status}</span>
           </div>
           <h1 className="text-4xl font-heading text-da-silver">{project.title}</h1>

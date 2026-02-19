@@ -47,7 +47,7 @@ function Landing() {
             </li>
             <li>
               <strong className="text-da-silver">Interests</strong>
-              <p>painting, reading philosophy, playing guitar, rock climbing, weight lifting</p>
+              <p>Painting, reading philosophy, playing guitar, rock climbing, and weight lifting</p>
             </li>
             <li>
               <strong className="text-da-silver">Availability</strong>
@@ -80,8 +80,7 @@ function Landing() {
             <Link key={project.slug} to={`/projects/${project.slug}`}>
               <GlassCard className="project-card relative">
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-da-silver/60 mb-3">
-                    <span>{project.timeline}</span>
+                  <div className="flex items-center justify-end text-xs uppercase tracking-[0.3em] text-da-silver/60 mb-3">
                     <span>{project.status}</span>
                   </div>
                   <h3 className="text-2xl font-heading text-da-silver">{project.title}</h3>

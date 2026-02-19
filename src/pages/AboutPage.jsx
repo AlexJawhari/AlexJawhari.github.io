@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { SECTION_VARIANTS } from '../config/animationConfig'
-import { TIMELINE } from '../data/timelineData'
+import { ABOUT_CARDS } from '../data/timelineData'
 import GlassCard from '../components/GlassCard'
 import SectionTitle from '../components/SectionTitle'
 
@@ -11,24 +11,22 @@ function AboutPage() {
         <SectionTitle eyebrow="About" title="Mission briefing" />
         <div className="space-y-6 text-da-silver/80 leading-relaxed">
           <p>
-            I am a CS junior at UT Dallas with backend instincts and debate-forged communication skills. I gravitate toward problems that require rigor, ethics, and operational calm —
-            building full-stack systems, RESTful APIs, geospatial platforms, and security scanners. My work spans automation tools that must stay invisible, data systems that guard their sources, and interfaces that feel like archival instruments.
+            I study computer science at UT Dallas (expected graduation May 2027) with a focus on backend systems and full-stack development. I gravitate toward problems that require rigor, ethics, and operational calm: building RESTful APIs, geospatial platforms, security scanners, and automation tools that stay invisible when they need to.
           </p>
           <p>
-            My engineering practice blends research notebooks, bespoke tooling, and a relentless respect for privacy. I would rather craft a precise, explainable tool than chase hype
-            features. Each project is treated as a field study: hypotheses, instrumentation, and reflection. When not coding, I paint, read philosophy, play guitar, climb rocks, and lift weights — each discipline informs the others.
+            My engineering practice blends research notebooks, bespoke tooling, and a strong respect for privacy. I would rather craft a precise, explainable tool than chase hype. Each project is treated as a field study: hypotheses, instrumentation, and reflection. When not coding, I paint, read philosophy, play guitar, climb rocks, and lift weights. Each discipline informs the others.
           </p>
         </div>
       </GlassCard>
 
-      <section className="grid lg:grid-cols-3 gap-6">
-        {TIMELINE.map(entry => (
-          <GlassCard key={entry.year}>
-            <div className="text-xs uppercase tracking-[0.3em] text-da-gold/80">{entry.year}</div>
-            <h3 className="text-xl font-heading text-da-silver mt-3">{entry.title}</h3>
+      <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {ABOUT_CARDS.map((card, idx) => (
+          <GlassCard key={idx}>
+            <div className="text-xs uppercase tracking-[0.3em] text-da-gold/80">{card.subtitle}</div>
+            <h3 className="text-xl font-heading text-da-silver mt-3">{card.title}</h3>
             <ul className="mt-4 space-y-3 text-sm text-da-silver/80">
-              {entry.details.map(detail => (
-                <li key={detail} className="flex gap-3">
+              {card.details.map((detail, i) => (
+                <li key={i} className="flex gap-3">
                   <span className="text-da-gold mt-1">▻</span>
                   <span>{detail}</span>
                 </li>

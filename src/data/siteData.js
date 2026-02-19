@@ -6,7 +6,7 @@ export const SITE = {
   name: 'Alexander Jawhari',
   title: 'Backend-leaning Software Engineer',
   summary:
-    'CS junior at UT Dallas building full-stack systems, RESTful APIs, and automation tools. I blend dark academia aesthetics with pragmatic engineering — crafting geospatial platforms, security scanners, and discreet scrapers that operate like mission control.',
+    'Computer science at UT Dallas (expected May 2027). I build full-stack systems, RESTful APIs, and automation tools. Geospatial platforms, security scanners, and scrapers that operate like mission control.',
   focus: 'Full stack development · RESTful APIs · web scraping & automation · geospatial systems · security testing · real-time systems',
   location: 'Dallas, TX · Remote friendly',
   email: 'alexjawhari00@gmail.com',
@@ -18,7 +18,7 @@ export const SITE = {
 export const HIGHLIGHT_STATS = [
   { label: 'Education', value: 'UT Dallas · B.S. CS · Expected May 2027' },
   { label: 'Primary focus', value: 'Full stack · APIs · automation · security' },
-  { label: 'Current status', value: 'CS junior · open to Summer 2026 roles' },
+  { label: 'Current status', value: 'Open to Summer 2026 roles' },
   { label: 'Philosophy', value: 'Privacy, precision, poetic rigor' }
 ]
 
@@ -41,7 +41,7 @@ export const CAPABILITIES = [
 ]
 
 export const PHILOSOPHY = [
-  'Dark academia meets mission control — handcrafted interfaces with orbital motion cues.',
+  'Dark academia meets mission control. Handcrafted interfaces with orbital motion cues.',
   'Systems should whisper: minimal surface area, graceful degradation, fewer dependencies.',
-  'Debate-forged communication meets engineering rigor. When not coding, I paint, read philosophy, play guitar, climb rocks, and lift weights — each discipline informs the others.'
+  'Debate-forged communication meets engineering rigor. When not coding, I paint, read philosophy, play guitar, climb rocks, and lift weights. Each discipline informs the others.'
 ]

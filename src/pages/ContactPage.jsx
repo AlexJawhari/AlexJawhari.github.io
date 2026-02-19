@@ -8,7 +8,7 @@ function ContactPage() {
   return (
     <motion.div variants={SECTION_VARIANTS} initial="hidden" animate="visible" className="space-y-8">
       <GlassCard>
-        <SectionTitle eyebrow="Contact" title="Direct links" description="No contact form — just precise channels." />
+        <SectionTitle eyebrow="Contact" title="Direct links" />
         <div className="grid md:grid-cols-3 gap-6">
           <a className="contact-card" href={`mailto:${SITE.email}`}>
             <span className="text-xs uppercase tracking-[0.3em] text-da-gold/70">Email</span>

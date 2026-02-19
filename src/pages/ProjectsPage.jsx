@@ -7,22 +7,26 @@ import GlassCard from '../components/GlassCard'
 import SectionTitle from '../components/SectionTitle'
 
 function ProjectsPage() {
-  const categories = useMemo(() => ['featured', 'systems', 'experiments', 'research'], [])
+  const categories = useMemo(() => [
+    { id: 'featured', label: 'Featured' },
+    { id: 'automation', label: 'Automation' },
+    { id: 'academic', label: 'Academic' }
+  ], [])
   const [activeCategory, setActiveCategory] = useState('featured')
   const filtered = PROJECTS.filter(project => project.category === activeCategory)
 
   return (
     <motion.div variants={SECTION_VARIANTS} initial="hidden" animate="visible" className="space-y-8">
       <GlassCard>
-        <SectionTitle eyebrow="Projects" title="Project guide" description="Filter between featured systems, infrastructure, and exploratory labs." />
+        <SectionTitle eyebrow="Projects" title="Project guide" description="Filter by category." />
         <div className="flex flex-wrap gap-3 mb-8">
-          {categories.map(category => (
+          {categories.map(({ id, label }) => (
             <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`tab ${category === activeCategory ? 'tab-active' : ''}`}
+              key={id}
+              onClick={() => setActiveCategory(id)}
+              className={`tab ${id === activeCategory ? 'tab-active' : ''}`}
             >
-              {category}
+              {label}
             </button>
           ))}
         </div>
@@ -33,8 +37,7 @@ function ProjectsPage() {
               <motion.div key={project.slug} layout variants={SECTION_VARIANTS} initial="hidden" animate="visible" exit={{ opacity: 0, y: 10 }} transition={{ duration: 0.4 }}>
                 <Link to={`/projects/${project.slug}`}>
                   <GlassCard className="project-tile">
-                    <div className="text-xs uppercase tracking-[0.3em] text-da-silver/60 flex justify-between">
-                      <span>{project.timeline}</span>
+                    <div className="text-xs uppercase tracking-[0.3em] text-da-silver/60 flex justify-end mb-1">
                       <span>{project.status}</span>
                     </div>
                     <h3 className="text-2xl font-heading text-da-silver mt-3">{project.title}</h3>
