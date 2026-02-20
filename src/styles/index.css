@@ -328,7 +328,7 @@
     0 0 35px rgba(18, 30, 61, 0.35);
   isolation: isolate;
   transform: translateZ(0);
-  will-change: transform;
+  contain: layout paint;
 }
 
 .pill-cta {
