@@ -10,7 +10,7 @@ function Header() {
           <p className="text-xs text-da-silver/60 tracking-[0.4em] uppercase">Software engineer</p>
         </div>
         <nav className="flex flex-wrap gap-2">
-          <NavItem to="/" label="Landing" />
+          <NavItem to="/" label="Home" />
           <NavItem to="/about" label="About" />
           <NavItem to="/projects" label="Projects" />
           <NavItem to="/resume" label="Resume" />
