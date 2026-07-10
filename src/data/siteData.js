@@ -6,9 +6,9 @@ export const SITE = {
   name: 'Alexander Jawhari',
   title: 'Software Engineer',
   summary:
-    'Computer science at UT Dallas — expected May 2027. I build full-stack systems, RESTful APIs, and automation tools. Geospatial platforms, security scanners, and scrapers that operate like mission control.',
-  focus: 'Full Stack Development · RESTful APIs · Web Scraping & Automation · Geospatial Systems · Security Testing · Real-Time Systems',
-  location: 'Dallas, TX · Remote friendly',
+    'Computer science at UT Dallas — expected May 2027. Currently a Software Development Engineer Intern at Amazon, building customer-facing features for Amazon Photos reaching 200+ million Prime members. I build full-stack systems, RESTful APIs, and automation tools.',
+  focus: 'Full Stack Development · React & TypeScript · RESTful APIs · Web Scraping & Automation · Geospatial Systems · Security Testing · Real-Time Systems',
+  location: 'Seattle, WA · Dallas, TX',
   email: 'alexjawhari00@gmail.com',
   github: 'https://github.com/AlexJawhari',
   linkedin: 'https://www.linkedin.com/in/alexjawhari',
@@ -17,8 +17,8 @@ export const SITE = {
 
 export const HIGHLIGHT_STATS = [
   { label: 'Education', value: 'UT Dallas · B.S. CS · Expected May 2027' },
-  { label: 'Primary focus', value: 'Full stack · APIs · automation · security' },
-  { label: 'Current status', value: 'Open to Summer 2026 roles' },
+  { label: 'Primary focus', value: 'Full stack · React · TypeScript · APIs' },
+  { label: 'Current status', value: 'SDE Intern at Amazon · Summer 2026' },
   { label: 'Philosophy', value: 'Privacy, precision, poetic rigor' }
 ]
 
@@ -26,8 +26,8 @@ export const CAPABILITIES = [
   {
     eyebrow: 'Backend',
     title: 'Full Stack & APIs',
-    text: 'RESTful API design, React applications, and geospatial platforms with real-time features and efficient query layers.',
-    tags: ['React', 'Node.js', 'Express', 'Python', 'Flask', 'Supabase', 'PostgreSQL']
+    text: 'RESTful API design, React & TypeScript applications, and geospatial platforms with real-time features and efficient query layers. Production experience at Amazon scale.',
+    tags: ['React', 'TypeScript', 'Redux Toolkit', 'Node.js', 'Express', 'Python', 'Flask', 'Supabase', 'PostgreSQL', 'AWS']
   },
   {
     eyebrow: 'Automation',

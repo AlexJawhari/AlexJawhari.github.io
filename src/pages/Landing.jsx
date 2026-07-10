@@ -46,8 +46,8 @@ function Landing() {
               <p>{SITE.location}</p>
             </li>
             <li>
-              <strong className="text-da-silver">Availability</strong>
-              <p>Open to internships / research roles for Summer 2026</p>
+              <strong className="text-da-silver">Current Role</strong>
+              <p>SDE Intern at Amazon · Summer 2026</p>
             </li>
             <li>
               <strong className="text-da-silver">Email</strong>

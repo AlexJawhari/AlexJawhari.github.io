@@ -4,6 +4,15 @@
 
 export const TIMELINE = [
   {
+    year: '2026',
+    title: 'Software Development Engineer Intern, Amazon',
+    details: [
+      'Engineered a new customer-facing front-end feature for Amazon Photos using React, TypeScript, and Redux Toolkit, built to reach Amazon\'s 200+ million Prime members worldwide',
+      'Wired front-end views to internal service APIs and connected components to the Redux store using React-Redux, modeling complex async state while partnering cross-functionally with Product, UX/Design, and backend Service teams to scope requirements and align on technical design',
+      'Authored Jest test suites and leveraged Amazon\'s internal experimentation and release pipelines to validate functionality and support a safe, phased rollout ahead of general availability'
+    ]
+  },
+  {
     year: '2025',
     title: 'Software Engineering Intern, Core Integrative Health',
     details: [
@@ -24,6 +33,15 @@ export const TIMELINE = [
 
 /** Six cards for About page grid (2x3 or 3x2) */
 export const ABOUT_CARDS = [
+  {
+    title: 'Amazon',
+    subtitle: 'SDE Intern · Summer 2026',
+    details: [
+      'Customer-facing feature for Amazon Photos using React, TypeScript, and Redux Toolkit',
+      'Serving 200+ million Prime members worldwide',
+      'Cross-functional collaboration with Product, UX/Design, and backend Service teams'
+    ]
+  },
   {
     title: 'Experience',
     subtitle: 'Software Engineering Intern',
@@ -65,14 +83,6 @@ export const ABOUT_CARDS = [
     details: [
       'Member',
       'CTF challenges, assembly reverse engineering, and security research'
-    ]
-  },
-  {
-    title: 'Availability',
-    subtitle: 'Open to roles',
-    details: [
-      'Internships and research roles',
-      'Summer 2026 and beyond'
     ]
   }
 ]
