@@ -8,8 +8,8 @@ export const SECTION_VARIANTS = {
 }
 
 // Pre-generate star positions so we can keep them stable and avoid stars overlapping planets
-// Random star count between 500-1000 for variety on each page load
-export const STAR_COUNT = 500 + Math.floor(Math.random() * 501) // Random between 500-1000
+// Increased star count: random between 1200-2000 for a denser night sky
+export const STAR_COUNT = 1200 + Math.floor(Math.random() * 801)
 
 // Reduced planet zone radius to allow more stars near planets
 // Stars will still be hidden if they're directly behind planets, but more will show
